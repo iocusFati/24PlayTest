@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
+using Gameplay.Level;
 using Infrastructure.AssetProviderService;
+using Infrastructure.Services.Input;
 using Infrastructure.Services.PersistentProgress;
 using Infrastructure.Services.Pool;
 using Infrastructure.Services.SaveLoad;
@@ -24,8 +26,23 @@ namespace Infrastructure
             BindPersistentProgress();
             BindAssetsService();
             BindPoolService();
+            BindLevelGenerator();
+            BindInputService();
 
             BindFactories();
+        }
+        
+        private void BindInputService() =>
+            Container
+                .Bind<IInputService>()
+                .FromMethod(InputService)
+                .AsSingle();
+
+        private void BindLevelGenerator()
+        {
+            Container
+                .BindInterfacesAndSelfTo<LevelGenerator>()
+                .AsSingle();
         }
 
         private void BindStaticData()
@@ -108,7 +125,7 @@ namespace Infrastructure
                 .FromInstance(this)
                 .AsSingle();
         }
-        
+
         private void BindGameStateMachine()
         {
             Container
@@ -128,5 +145,10 @@ namespace Infrastructure
             Debug.Log("Action");
             action.Invoke();
         }
+
+        private IInputService InputService() =>
+            Application.isEditor
+                ? new StandaloneInput()
+                : new MobileInput();
     }
 }

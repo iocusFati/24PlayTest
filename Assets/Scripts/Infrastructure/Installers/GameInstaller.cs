@@ -7,14 +7,6 @@ namespace Infrastructure
     {
         public override void InstallBindings()
         {
-            BindLevelGenerator();
-        }
-
-        private void BindLevelGenerator()
-        {
-            Container
-                .BindInterfacesAndSelfTo<LevelGenerator>()
-                .AsSingle();
         }
     }
 }

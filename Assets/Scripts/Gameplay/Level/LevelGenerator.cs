@@ -7,7 +7,7 @@ using Zenject;
 
 namespace Gameplay.Level
 {
-    public class LevelGenerator : IInitializable
+    public class LevelGenerator
     {
         private readonly ChunkPoolsHolder _chunkChunkPools;
         private readonly ChunksConfig _chunksConfig;

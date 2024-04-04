@@ -1,30 +1,32 @@
+using Gameplay.Level;
 using Infrastructure.Services.SaveLoad;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Zenject;
+using Utils;
 
 namespace Infrastructure.States
 {
     public class LoadLevelState : IPayloadedState<string>
     {
-        private const string PlayerSpawnTag = "PlayerSpawn";
-        
         private readonly ISaveLoadService _saveLoadService;
         private readonly IGameStateMachine _gameStateMachine;
         private readonly IPlayerFactory _playerFactory;
         private readonly SceneLoader _sceneLoader;
+        private readonly LevelGenerator _levelGenerator;
 
-        private Vector3 _initialPoint;
+        private Transform _initialPoint;
 
         public LoadLevelState(IGameStateMachine gameStateMachine,
             ISaveLoadService saveLoadService,
-            IPlayerFactory playerFactory, 
-            SceneLoader sceneLoader)
+            IPlayerFactory playerFactory,
+            SceneLoader sceneLoader, 
+            LevelGenerator levelGenerator)
         {
             _gameStateMachine = gameStateMachine;
             _saveLoadService = saveLoadService;
             _playerFactory = playerFactory;
             _sceneLoader = sceneLoader;
+            _levelGenerator = levelGenerator;
         }
 
         public void Enter(string sceneName)
@@ -46,8 +48,13 @@ namespace Infrastructure.States
 
         private void OnLoaded()
         {
-            // _initialPoint = GameObject.FindWithTag(PlayerSpawnTag).transform.position;
-            // _playerFactory.CreatePlayer(_initialPoint);
+            _levelGenerator.Initialize();
+            
+            _initialPoint = GameObject.FindWithTag(Tags.PlayerSpawn).transform;
+            
+            Player player = _playerFactory.CreatePlayer(_initialPoint);
+            player.Initialize();
+            
             //
             // _saveLoadService.InformReaders();
             // _gameStateMachine.Enter<GameLoopState>();

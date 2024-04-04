@@ -1,10 +1,11 @@
-﻿using UnityEngine;
-
-namespace Infrastructure.Services.Input
+﻿namespace Infrastructure.Services.Input
 {
     public class StandaloneInput : InputService
     {
-        public override bool Tap() => 
-            UnityEngine.Input.GetKeyDown(KeyCode.Space);
+        protected override bool IsMoving() => 
+            UnityEngine.Input.GetMouseButton(0);
+
+        protected override bool CanStartMoving() => 
+            UnityEngine.Input.GetMouseButtonDown(0);
     }
 }

@@ -7,7 +7,8 @@ namespace Infrastructure.AssetProviderService
         
         public const string PlayerData = "StaticData/Player";
         public const string ChunkConfig = "StaticData/Configs/ChunkConfig";
-        
+        public const string PlayerConfig = "StaticData/Configs/PlayerConfig";
+
         public const string UIRoot = "VALUE";
     }
 }

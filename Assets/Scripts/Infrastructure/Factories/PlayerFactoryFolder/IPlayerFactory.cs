@@ -5,6 +5,6 @@ namespace Infrastructure.States
 {
     public interface IPlayerFactory : IService
     {
-        void CreatePlayer(Vector3 at);
+        Player CreatePlayer(Transform at);
     }
 }
