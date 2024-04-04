@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: PlayerConfig
   m_EditorClassIdentifier: 
   _speed: 5
-  _rightEdgeX: 2.5
-  _leftEdgeX: -2.5
+  _rightEdgeX: 2.025
+  _leftEdgeX: -2.025

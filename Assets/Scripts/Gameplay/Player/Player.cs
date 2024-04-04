@@ -1,4 +1,5 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using Cinemachine;
+using Cysharp.Threading.Tasks;
 using Gameplay.Level;
 using Infrastructure.Services.Input;
 using Infrastructure.Services.StaticDataService;
@@ -39,6 +40,8 @@ namespace Infrastructure.States
         public void Initialize()
         {
             StartMovementOnGetMovement().Forget();
+
+            CinemachineCore.Instance.GetActiveBrain(0).ActiveVirtualCamera.Follow = transform;
         }
 
         private async UniTaskVoid StartMovementOnGetMovement()
