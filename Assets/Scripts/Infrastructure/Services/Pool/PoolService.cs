@@ -1,20 +1,27 @@
-﻿using Infrastructure.AssetProviderService;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Gameplay.Level;
+using Infrastructure.Services.StaticDataService;
+using Infrastructure.StaticData.ChunkData;
 
 namespace Infrastructure.Services.Pool
 {
     public class PoolService : IPoolService
     {
-        private readonly IAssets _assets;
+        private ChunksConfig _chunkConfig;
 
-        public PoolService(IAssets assets)
+        public ChunkPoolsHolder ChunkChunkPools { get; set; }
+
+        public PoolService(IStaticDataService staticData)
         {
-            _assets = assets;
+            _chunkConfig = staticData.ChunkConfig;
             
             Initialize();
         }
-        
+
         public void Initialize()
         {
+            ChunkChunkPools = new ChunkPoolsHolder(_chunkConfig.ChunkPrefabs);
         }
     }
 }

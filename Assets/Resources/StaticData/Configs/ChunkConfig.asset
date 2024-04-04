@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6bee58089d7418eb77427d2ff515193, type: 3}
+  m_Name: ChunkConfig
+  m_EditorClassIdentifier: 
+  _chunks:
+  - {fileID: 2300267856329026576, guid: 8ad454d65998029469cc57cb036b0ca2, type: 3}
+  - {fileID: 4258587466787388338, guid: e537b2eff5c403a418e9b6c94f87920b, type: 3}
+  - {fileID: 8283572209070157810, guid: 28b7b9e250ecd5342b3eb32d85f45997, type: 3}
+  - {fileID: 4359562928757661681, guid: dedacf260c3b70646ad62cf0d86f4758, type: 3}
+  - {fileID: 8839728549759788960, guid: cbf3ed518d0f6e247ac43c48f3a49350, type: 3}
+  _maxChunksInOneTime: 5
+  _chunksInTheBeginning: 3

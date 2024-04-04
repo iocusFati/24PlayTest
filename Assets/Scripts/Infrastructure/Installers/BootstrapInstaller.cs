@@ -2,7 +2,9 @@ using System;
 using System.Collections;
 using Infrastructure.AssetProviderService;
 using Infrastructure.Services.PersistentProgress;
+using Infrastructure.Services.Pool;
 using Infrastructure.Services.SaveLoad;
+using Infrastructure.Services.StaticDataService;
 using Infrastructure.States;
 using UnityEngine;
 using Zenject;
@@ -13,6 +15,7 @@ namespace Infrastructure
     {
         public override void InstallBindings()
         {
+            BindStaticData();
             BindSceneLoader();
             BindStatesFactory();
             BindCoroutineRunner();
@@ -20,9 +23,31 @@ namespace Infrastructure
             BindSaveLoadService();
             BindPersistentProgress();
             BindAssetsService();
-
+            BindPoolService();
 
             BindFactories();
+        }
+
+        private void BindStaticData()
+        {
+            StaticDataService staticData = Container.Instantiate<StaticDataService>();
+
+            Container
+                .Bind<IStaticDataService>()
+                .FromInstance(staticData)
+                .AsSingle();
+            
+            staticData.Initialize();
+        }
+
+        private void BindPoolService()
+        {
+            PoolService poolService = Container.Instantiate<PoolService>();
+            
+            Container
+                .Bind<IPoolService>()
+                .FromInstance(poolService)
+                .AsSingle();
         }
 
         private void BindAssetsService()

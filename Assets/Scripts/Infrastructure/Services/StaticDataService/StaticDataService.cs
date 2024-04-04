@@ -1,4 +1,5 @@
 ﻿using Infrastructure.AssetProviderService;
+using Infrastructure.StaticData.ChunkData;
 using Infrastructure.StaticData.PlayerData;
 using UnityEngine;
 
@@ -7,15 +8,14 @@ namespace Infrastructure.Services.StaticDataService
     public class StaticDataService : IStaticDataService
     {
         public PlayerStaticData PlayerData { get; set; }
+        public ChunksConfig ChunkConfig { get; private set; }
 
         public void Initialize()
         {
-            InitializePlayerData();
+            InitializeChunkConfig();
         }
 
-        private void InitializePlayerData()
-        {
-            PlayerData = Resources.Load<PlayerStaticData>(AssetPaths.PlayerData);
-        }
+        private void InitializeChunkConfig() => 
+            ChunkConfig = Resources.Load<ChunksConfig>(AssetPaths.ChunkConfig);
     }
 }

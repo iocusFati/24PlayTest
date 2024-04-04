@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Infrastructure.AssetProviderService;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -9,10 +8,8 @@ namespace Infrastructure.Services.Pool
     
     public abstract class BasePool<TPoolable> where TPoolable : Component
     {
-        protected readonly IAssets _assets;
-        
         private IObjectPool<TPoolable> _blockPool;
-        
+
         private readonly List<TPoolable> _activePoolables = new();
 
         private IObjectPool<TPoolable> Pool
@@ -25,11 +22,6 @@ namespace Infrastructure.Services.Pool
                     poolable => { poolable.gameObject.SetActive(false); },
                     poolable => { Object.Destroy(poolable.gameObject); });
             }
-        }
-
-        protected BasePool(IAssets assets)
-        {
-            _assets = assets;
         }
 
         protected abstract TPoolable Spawn();

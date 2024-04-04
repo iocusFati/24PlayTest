@@ -25,7 +25,6 @@ namespace Infrastructure.States
             _saveLoadService = saveLoadService;
             _playerFactory = playerFactory;
             _sceneLoader = sceneLoader;
-            
         }
 
         public void Enter(string sceneName)
@@ -47,11 +46,11 @@ namespace Infrastructure.States
 
         private void OnLoaded()
         {
-            _initialPoint = GameObject.FindWithTag(PlayerSpawnTag).transform.position;
-            _playerFactory.CreatePlayer(_initialPoint);
-            
-            _saveLoadService.InformReaders();
-            _gameStateMachine.Enter<GameLoopState>();
+            // _initialPoint = GameObject.FindWithTag(PlayerSpawnTag).transform.position;
+            // _playerFactory.CreatePlayer(_initialPoint);
+            //
+            // _saveLoadService.InformReaders();
+            // _gameStateMachine.Enter<GameLoopState>();
         }
 
         private void Reload()

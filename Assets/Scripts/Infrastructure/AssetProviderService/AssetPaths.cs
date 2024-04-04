@@ -6,6 +6,8 @@ namespace Infrastructure.AssetProviderService
         public const string Player = "Prefabs/Player/Player";
         
         public const string PlayerData = "StaticData/Player";
+        public const string ChunkConfig = "StaticData/Configs/ChunkConfig";
+        
         public const string UIRoot = "VALUE";
     }
 }
