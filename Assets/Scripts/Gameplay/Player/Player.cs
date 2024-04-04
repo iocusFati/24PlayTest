@@ -4,5 +4,6 @@ namespace Infrastructure.States
 {
     public class Player : MonoBehaviour
     {
+        
     }
 }
