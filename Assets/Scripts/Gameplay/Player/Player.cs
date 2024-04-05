@@ -1,4 +1,5 @@
-﻿using Cinemachine;
+﻿using System;
+using Cinemachine;
 using Cysharp.Threading.Tasks;
 using Gameplay.Camera;
 using Gameplay.Level;
@@ -78,22 +79,29 @@ namespace Infrastructure.States
 
         private void SubscribeForBaseCubeEvents()
         {
+            TimeSpan spawnNextChunkTimeSpan = TimeSpan.FromSeconds(1);
+
             _baseCubeRB.OnTriggerEnterAsObservable()
                 .Where(other => other.CompareTag(Tags.Pickup))
                 .Subscribe(PickUp);
-            _baseCubeRB.OnTriggerExitAsObservable()
-                .Where(other => other.CompareTag(Tags.WallTrigger))
-                .Subscribe(_ => _levelGenerator.SpawnNextChunk());
-        }
 
-        private void OnTriggerExit(Collider other)
-        {
-            if (other.CompareTag(Tags.Wall))
+            SubscribeForNewChunk();
+
+            void SubscribeForNewChunk()
             {
-                _levelGenerator.SpawnNextChunk();
+                IObservable<Collider> observable = _baseCubeRB.OnTriggerExitAsObservable()
+                    .Where(other => other.CompareTag(Tags.WallTrigger));
+
+                observable
+                    .Throttle(spawnNextChunkTimeSpan)
+                    .First()
+                    .Subscribe(_ =>
+                    {
+                        _levelGenerator.SpawnNextChunk(true);
+                        SubscribeForNewChunk();
+                    });
             }
         }
-
         public void Initialize()
         {
             StartMovementOnGetMovement().Forget();

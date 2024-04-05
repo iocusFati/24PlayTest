@@ -423,6 +423,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 085ad57d0f0d5924f8ec77fd5eeb27f9, type: 3}
+--- !u!1 &3546043010246151624 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1605320670274906663, guid: 085ad57d0f0d5924f8ec77fd5eeb27f9, type: 3}
+  m_PrefabInstance: {fileID: 2842103351106693103}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &3512498822514205617
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -566,6 +571,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 085ad57d0f0d5924f8ec77fd5eeb27f9, type: 3}
+--- !u!1 &2840850816789055905 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1605320670274906663, guid: 085ad57d0f0d5924f8ec77fd5eeb27f9, type: 3}
+  m_PrefabInstance: {fileID: 3543071083412644742}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &4154314333661799422
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -783,6 +793,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 085ad57d0f0d5924f8ec77fd5eeb27f9, type: 3}
+--- !u!1 &3144765558257889582 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1605320670274906663, guid: 085ad57d0f0d5924f8ec77fd5eeb27f9, type: 3}
+  m_PrefabInstance: {fileID: 4459492967522753289}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &4740231961149245570
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1086,6 +1101,22 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -3489324984016473629, guid: 50a4c5a3ba3f26d469aac1ecdbaefd2f, type: 3}
+      propertyPath: _pickups.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: -3489324984016473629, guid: 50a4c5a3ba3f26d469aac1ecdbaefd2f, type: 3}
+      propertyPath: _pickups.Array.data[0]
+      value: 
+      objectReference: {fileID: 3546043010246151624}
+    - target: {fileID: -3489324984016473629, guid: 50a4c5a3ba3f26d469aac1ecdbaefd2f, type: 3}
+      propertyPath: _pickups.Array.data[1]
+      value: 
+      objectReference: {fileID: 3144765558257889582}
+    - target: {fileID: -3489324984016473629, guid: 50a4c5a3ba3f26d469aac1ecdbaefd2f, type: 3}
+      propertyPath: _pickups.Array.data[2]
+      value: 
+      objectReference: {fileID: 2840850816789055905}
     - target: {fileID: 4705048623700722288, guid: 50a4c5a3ba3f26d469aac1ecdbaefd2f, type: 3}
       propertyPath: m_RootOrder
       value: 2

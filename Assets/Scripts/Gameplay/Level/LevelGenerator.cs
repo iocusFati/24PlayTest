@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using DG.Tweening;
 using Infrastructure.Services.Pool;
 using Infrastructure.Services.StaticDataService;
 using Infrastructure.StaticData.ChunkData;
@@ -25,34 +26,51 @@ namespace Gameplay.Level
         public void Initialize()
         {
             _firstChunk = Object.FindFirstObjectByType<Chunk>();
-            _spawnedChunks.Add(_firstChunk);
             
             GenerateFirstChunks();
         }
         
         public void GenerateFirstChunks()
         {
+            _spawnedChunks.Add(_firstChunk);
             _firstChunk.gameObject.SetActive(true);
             
             for (int i = 0; i < _chunksConfig.ChunksInTheBeginning - 1; i++)
             {
-                 SpawnNextChunk();
+                 SpawnNextChunk(false);
             }
         }
 
-        public void SpawnNextChunk()
+        public void SpawnNextChunk(bool withAnimation)
         {
             Chunk chunk = GetChunk();
 
-            SetChunkTransform(chunk);
+            if (withAnimation) 
+                ChunkMoveAppear(chunk);
+            else
+                SetChunkTransform(chunk);
             
             UpdateSpawnedChunks(chunk);
         }
 
+        private void ChunkMoveAppear(Chunk chunk)
+        {
+            Vector3 chunkSpawnPosition = _spawnedChunks[^1].End;
+            chunk.transform.SetPositionAndRotation(
+                chunkSpawnPosition - _chunksConfig.SpawnOffset, _firstChunk.transform.rotation);
+
+            chunk.transform.DOMove(chunkSpawnPosition, _chunksConfig.MoveToSpawnPointDuration);
+
+        }
+
         public void HideAllChunks()
         {
-            for (int index = 1; index < _spawnedChunks.Count;) 
+            int startIndex = _firstChunk.gameObject.activeSelf ? 1 : 0;
+            
+            for (int index = startIndex ; index < _spawnedChunks.Count;) 
                 ReleaseChunk(index);
+            
+            Debug.Log("Spawned chunks " + _spawnedChunks.Count);
         }
 
         private void UpdateSpawnedChunks(Chunk chunk)
@@ -71,6 +89,7 @@ namespace Gameplay.Level
             if (_spawnedChunks[0] == _firstChunk)
             {
                 _firstChunk.gameObject.SetActive(false);
+                _spawnedChunks.RemoveAt(0);
                 
                 return;
             }
@@ -99,7 +118,8 @@ namespace Gameplay.Level
         private void SetChunkTransform(Chunk chunk)
         {
             Vector3 chunkSpawnPosition = _spawnedChunks[^1].End;
-            chunk.transform.SetPositionAndRotation(chunkSpawnPosition, _firstChunk.transform.rotation);
+            chunk.transform.SetPositionAndRotation(
+                chunkSpawnPosition, _firstChunk.transform.rotation);
         }
     }
 }
