@@ -13,15 +13,21 @@ namespace Infrastructure.States
         
         private Direction _blockDirection;
         
-        private readonly CompositeDisposable _sideMoveDisposer;
+        private Rigidbody _baseCubeRB;
 
-        public PlayerMovement(IInputService inputService, Transform playerTransform, PlayerConfig playerConfig)
+        private readonly CompositeDisposable _sideMoveDisposer;
+        private readonly CompositeDisposable _forwardMoveDisposer;
+
+        public PlayerMovement(IInputService inputService, PlayerConfig playerConfig, Transform playerTransform,
+            Rigidbody baseCubeRB)
         {
             _inputService = inputService;
             _playerTransform = playerTransform;
             _playerConfig = playerConfig;
+            _baseCubeRB = baseCubeRB;
             
             _sideMoveDisposer = new CompositeDisposable();
+            _forwardMoveDisposer = new CompositeDisposable();
         }
 
         public void StartMoving()
@@ -29,6 +35,18 @@ namespace Infrastructure.States
             Observable.EveryUpdate()
                 .Subscribe(_ => MoveSide())
                 .AddTo(_sideMoveDisposer);
+
+            Observable.EveryFixedUpdate()
+                .Subscribe(_ => MoveForward())
+                .AddTo(_forwardMoveDisposer);
+        }
+
+        private void MoveForward()
+        {
+            Vector3 velocity = _baseCubeRB.transform.forward * _playerConfig.Speed * Time.fixedDeltaTime;
+            velocity += Physics.gravity;
+            
+            _baseCubeRB.velocity = velocity;
         }
 
         private void MoveSide()
@@ -37,7 +55,7 @@ namespace Infrastructure.States
             Vector3 playerPos = _playerTransform.position;
             
             Vector3 hypotheticalDisplacement = 
-                playerPos + new Vector3(movement * _playerConfig.Speed * Time.deltaTime, 0, 0);
+                playerPos + new Vector3(movement * _playerConfig.SideSpeed * Time.deltaTime, 0, 0);
             
             switch (_blockDirection)
             {

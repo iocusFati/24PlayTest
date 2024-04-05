@@ -13,7 +13,7 @@ namespace Gameplay.Level
         {
             get
             {
-                if (_id is null)
+                if (_id is null or "")
                 {
                     UniqueId uniqueId = GetComponent<UniqueId>();
 
