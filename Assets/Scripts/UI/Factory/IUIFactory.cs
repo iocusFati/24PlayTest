@@ -1,5 +1,5 @@
-﻿using Base.UI.Entities;
-using Infrastructure.Services;
+﻿using Infrastructure.Services;
+using Infrastructure.States;
 
 namespace Base.UI.Factory
 {
@@ -7,5 +7,7 @@ namespace Base.UI.Factory
     {
         void CreateGameUIRoot();
         HUD CreateHUD();
+        LostPopUp CreateLostPopUp();
+        ScreenFader CreateScreenFader();
     }
 }

@@ -1,7 +1,5 @@
-﻿using Infrastructure.Services.Input;
-using UnityEngine;
-using UnityEngine.SceneManagement;
-using Zenject;
+﻿using Base.UI.Factory;
+using Infrastructure.Services.Input;
 
 namespace Infrastructure.States
 {
@@ -9,32 +7,28 @@ namespace Infrastructure.States
     {
         private readonly IGameStateMachine _gameStateMachine;
         private readonly IInputService _inputService;
-        private ICoroutineRunner _coroutineRunner;
-        
+        private readonly IUIFactory _uiFactory;
+
         private readonly float _timeBeforeLose;
         private readonly float _cameraRotateDuration;
         
-        public GameLostState(
-            IGameStateMachine gameStateMachine)
-            // IInputService inputService,
-            // ICoroutineRunner coroutineRunner)
+        private LostPopUp _lostPopUp;
+
+        public GameLostState(IGameStateMachine gameStateMachine, IUIFactory uiFactory)
         {
             _gameStateMachine = gameStateMachine;
-            // _inputService = inputService;
-            // _coroutineRunner = coroutineRunner;
-            
-            Debug.Log("GameLost");
+            _uiFactory = uiFactory;
         }
-
-        [Inject]
-        public void Construct(IGameStateMachine gameStateMachine)
-        {
-
-            Debug.Log("GameLost");
-        }
-
+        
         public void Enter()
         {
+            if (_lostPopUp is null)
+            {
+                _lostPopUp = _uiFactory.CreateLostPopUp();
+                _lostPopUp.OnReplayButtonClicked += RestartGame;
+            }
+
+            _lostPopUp.Show();
         }
 
         public void Exit()
@@ -43,7 +37,8 @@ namespace Infrastructure.States
         
         private void RestartGame()
         {
-            _gameStateMachine.Enter<LoadLevelState, string>(SceneManager.GetActiveScene().name);
+            _gameStateMachine.Enter<ReloadLevelState>();
+            _lostPopUp.Hide();
         }
     }
 }

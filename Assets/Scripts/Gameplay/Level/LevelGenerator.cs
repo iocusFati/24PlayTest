@@ -32,6 +32,8 @@ namespace Gameplay.Level
         
         public void GenerateFirstChunks()
         {
+            _firstChunk.gameObject.SetActive(true);
+            
             for (int i = 0; i < _chunksConfig.ChunksInTheBeginning - 1; i++)
             {
                  SpawnNextChunk();
@@ -45,6 +47,12 @@ namespace Gameplay.Level
             SetChunkTransform(chunk);
             
             UpdateSpawnedChunks(chunk);
+        }
+
+        public void HideAllChunks()
+        {
+            for (int index = 1; index < _spawnedChunks.Count;) 
+                ReleaseChunk(index);
         }
 
         private void UpdateSpawnedChunks(Chunk chunk)
@@ -66,11 +74,16 @@ namespace Gameplay.Level
                 
                 return;
             }
+
+            ReleaseChunk(0);
+        }
+
+        private void ReleaseChunk(int index)
+        {
+            BasePool<Chunk> pool = _chunkChunkPools.GetPoolById(_spawnedChunks[index].Id);
+            pool.Release(_spawnedChunks[index]);
             
-            BasePool<Chunk> pool = _chunkChunkPools.GetPoolById(_spawnedChunks[0].Id);
-            pool.Release(_spawnedChunks[0]);
-                
-            _spawnedChunks.RemoveAt(0);
+            _spawnedChunks.RemoveAt(index);
         }
 
         private Chunk GetChunk()

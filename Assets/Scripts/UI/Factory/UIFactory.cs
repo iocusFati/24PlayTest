@@ -1,4 +1,5 @@
 ﻿using Infrastructure.AssetProviderService;
+using Infrastructure.States;
 using UnityEngine;
 using Zenject;
 
@@ -34,26 +35,36 @@ namespace Base.UI.Factory
             return hud;
         }
 
+        public LostPopUp CreateLostPopUp()
+        {
+            LostPopUp lostPopUp = CreateUIEntity<LostPopUp>(AssetPaths.LostPopUp);
+
+            return lostPopUp;
+        }
+
+        public ScreenFader CreateScreenFader()
+        {
+            return CreateUIEntity<ScreenFader>(AssetPaths.ScreenFader);
+        }
+
         private TEntity CreateUIEntity<TEntity>(string path, Canvas parent = null) where TEntity : Component, IUIEntity
         {
-            parent = SetParentIfNull();
+            SetParentIfNull();
 
             TEntity entity = _assets.Instantiate<TEntity>(path, parent.transform);
-            _uiContainer.RegisterUIEntity(entity);
+            // _uiContainer.RegisterUIEntity(entity);
 
             return entity;
 
-            Canvas SetParentIfNull()
+            void SetParentIfNull()
             {
                 if (parent is not null) 
-                    return parent;
-                
-                if (_gameRoot == null)
-                    CreateGameUIRoot();
-                else
-                    parent = _gameRoot;
+                    return;
 
-                return parent;
+                if (_gameRoot == null) 
+                    CreateGameUIRoot();
+                
+                parent = _gameRoot;
             }
         }
 

@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using Infrastructure.Services.Pool;
 using Infrastructure.StaticData.PlayerData;
 using Sirenix.OdinInspector;
@@ -12,42 +15,51 @@ namespace Infrastructure.States
 {
     public class PlayerStack : MonoBehaviour
     {
-        [SerializeField] private GameObject _cubePrefab;
         [SerializeField] private Transform _stickman;
         [SerializeField] private Transform _cubeHolder;
 
         [SerializeField] private List<Transform> _stackedCubes;
-
-        private PlayerConfig _playerConfig;
+        
+        private Vector3 _stickmanInitialLocalPosition;
+        private Vector3 _cubeHolderInitialLocalPosition;
 
         private CubeCacher _cubeCacher;
-        private Vector3 _stickmanInitialLocalPosition;
-        private PathPool<Transform> _simpleCubesPool;
+        private PlayerConfig _playerConfig;
+        private BasePool<Transform> _simpleCubesPool;
+        private BasePool<Transform> _playerCubePool;
+        private CancellationTokenSource _tokenSource;
 
-        public event Action<GameObject> OnStacked;
-        public event Action<GameObject> OnRemoved;
+        public event Action OnLost;
 
         public void Construct(PlayerConfig playerConfig, IPoolService poolService)
         {
             _playerConfig = playerConfig;
             _simpleCubesPool = poolService.SimpleCubes;
+            _playerCubePool = poolService.PlayerCubes;
         }
 
         private void Awake()
         {
             _cubeCacher = new CubeCacher();
             _stickmanInitialLocalPosition = _stickman.localPosition;
+            _cubeHolderInitialLocalPosition = _cubeHolder.localPosition;
             
-            _stackedCubes[0].GetComponent<PlayerCube>().Construct(this);
-            // OnStacked?.Invoke(_stackedCubes[0].gameObject);
+            _tokenSource = new CancellationTokenSource();
+
+            PlayerMainCube mainCube = _stackedCubes[0].GetComponent<PlayerMainCube>();
+            mainCube.Construct(this);
+            mainCube.OnWallTriggerEntered += AllStackedCubesCheckForCollision;
         }
+
+        public void Initialize() => 
+            SetStickman(_stackedCubes[0]);
 
         [Button]
         public void AddCube()
         {
             _cubeHolder.position += new Vector3(0, _playerConfig.RaiseBy, 0);
             
-            GameObject cube = Instantiate(_cubePrefab, _cubeHolder);
+            Transform cube = SpawnCube();
 
             PlayerCube playerCube = cube.GetComponent<PlayerCube>();
             playerCube.Construct(this);
@@ -63,8 +75,6 @@ namespace Infrastructure.States
             SetJoints();
 
             _stackedCubes.Insert(1, cubeTransform);
-            
-            OnStacked?.Invoke(cube);
 
             
             void PlaceBaseBlock()
@@ -77,9 +87,9 @@ namespace Infrastructure.States
 
             void SetJoints()
             {
-                Rigidbody spawnedRB = _cubeCacher.Get(cube).CubeRB;
+                Rigidbody spawnedRB = _cubeCacher.Get(cube.gameObject).CubeRB;
                 Rigidbody firstRB = _cubeCacher.Get(_stackedCubes[0].gameObject).CubeRB;
-                ConfigurableJoint spawnedCubeJoint = _cubeCacher.Get(cube).Joint;
+                ConfigurableJoint spawnedCubeJoint = _cubeCacher.Get(cube.gameObject).Joint;
 
                 if (_stackedCubes.Count > 1)
                 {
@@ -89,12 +99,14 @@ namespace Infrastructure.States
                 
                 spawnedCubeJoint.connectedBody = firstRB;
             }
-        }
 
-        private void SetStickman(GameObject cube)
-        {
-            _stickman.SetParent(cube.transform);
-            _stickman.localPosition = _stickmanInitialLocalPosition;
+            Transform SpawnCube()
+            {
+                Transform spawnCube = _playerCubePool.Get();
+                
+                spawnCube.SetParent(_cubeHolder);
+                return spawnCube;
+            }
         }
 
         [Button]
@@ -108,8 +120,68 @@ namespace Infrastructure.States
                 RemoveBaseCube();
         }
 
+        public void HolderToInitialPosition() => 
+            _cubeHolder.localPosition = _cubeHolderInitialLocalPosition;
+
+        private void AllStackedCubesCheckForCollision()
+        {
+            List<Transform> collidedCubes = GetCollidedCubes();
+
+            if (collidedCubes.Count == _stackedCubes.Count)
+            {
+                _stickman.SetParent(_cubeHolder);
+                
+                ReplaceAllCubesWithSimpleOnes();
+                Lose();
+            }
+            else
+            {
+                //place main cube at the last position, so that it couldn't effect linked destroying of other cubes
+                collidedCubes.Reverse();
+                foreach (var collidedCube in collidedCubes)
+                {
+                    RemoveCube(collidedCube.gameObject);
+                }
+            }
+
+            List<Transform> GetCollidedCubes()
+            {
+                List<Transform> cubes = new List<Transform>();
+                
+                foreach (var stackedCube in _stackedCubes)
+                {
+                    if (_cubeCacher.Get(stackedCube.gameObject).PlayerCube.CheckForCollision()) 
+                        cubes.Add(stackedCube);
+                }
+
+                return cubes;
+            }
+
+            void ReplaceAllCubesWithSimpleOnes()
+            {
+                for (int index = 1; index < _stackedCubes.Count;)
+                {
+                    ReplaceStackedCubeWithSimpleOne(index, false);
+                    _stackedCubes.RemoveAt(index);
+                }
+            }
+        }
+
+        private void SetStickman(Transform parent)
+        {
+            _stickman.SetParent(parent);
+            _stickman.localPosition = _stickmanInitialLocalPosition;
+        }
+
         private void RemoveBaseCube()
         {
+            if (_stackedCubes.Count == 1)
+            {
+                Lose();
+
+                return;
+            }
+            
             Vector3 secondCubePosition = _stackedCubes[1].position;
             
             DisableCube(1);
@@ -122,6 +194,8 @@ namespace Infrastructure.States
 
             Transform simpleCube = _simpleCubesPool.Get();
             simpleCube.position = simpleCubePosition;
+
+            AutoreleaseSimpleCubeAsync(simpleCube).Forget();
                 
             if (_stackedCubes.Count > 1) 
                 SetJoints();
@@ -135,14 +209,6 @@ namespace Infrastructure.States
             }
         }
 
-        private void DisableCube(int index)
-        {
-            if (_stackedCubes.Count == 2) 
-                SetStickman(_stackedCubes[0].gameObject);
-            
-            _stackedCubes[index].gameObject.SetActive(false);
-        }
-
         private void RemoveCubeWithIndex(int cubeIndex)
         {
             ReplaceStackedCubeWithSimpleOne(cubeIndex);
@@ -152,38 +218,76 @@ namespace Infrastructure.States
                 StackCubeCached cubeCachedAboveIndex = _cubeCacher.Get(_stackedCubes[cubeIndex + 1].gameObject);
                 StackCubeCached cubeCachedBelowIndex = _cubeCacher.Get(_stackedCubes[cubeIndex - 1].gameObject);
 
-                SetJointYDrive(cubeCachedAboveIndex);
+                StartCoroutine(SetJointYDrive(cubeCachedAboveIndex));
 
                 cubeCachedAboveIndex.Joint.connectedBody = cubeCachedBelowIndex.CubeRB;
             }
             
-            // OnRemoved.Invoke(_stackedCubes[cubeIndex].gameObject);
             _stackedCubes.RemoveAt(cubeIndex);
         }
 
-        private void ReplaceStackedCubeWithSimpleOne(int cubeIndex)
+        private void Lose()
         {
-            DisableCube(cubeIndex);
+            _cubeCacher.Get(_stackedCubes[0].gameObject).PlayerCube.enabled = false;
+                
+            _tokenSource.Cancel();
+                
+            OnLost.Invoke();
+        }
+
+        private async UniTaskVoid AutoreleaseSimpleCubeAsync(Transform simpleCube)
+        {
+            CancellationToken token = _tokenSource.Token;
+            
+            await UniTask.Delay(TimeSpan.FromSeconds(_playerConfig.SimpleCubeAutoreleaseTime), DelayType.DeltaTime,
+                PlayerLoopTiming.Update, token);
+            
+            Debug.Log("Release");
+            
+            _simpleCubesPool.Release(simpleCube);
+        }
+
+        private void DisableCube(int index, bool shouldInfluenceStickman = true)
+        {
+            if (_stackedCubes.Count == 2 && shouldInfluenceStickman) 
+                SetStickman(_stackedCubes[0]);
+            
+            _playerCubePool.Release(_stackedCubes[index]);
+        }
+
+        private void ReplaceStackedCubeWithSimpleOne(int cubeIndex, bool shouldInfluenceStickman = true)
+        {
+            DisableCube(cubeIndex, shouldInfluenceStickman);
             
             Transform simpleCube = _simpleCubesPool.Get();
             simpleCube.position = _stackedCubes[cubeIndex].position;
+            
+            AutoreleaseSimpleCubeAsync(simpleCube).Forget();
         }
 
-        private void SetJointYDrive(StackCubeCached cubeCachedAbove)
+        private IEnumerator SetJointYDrive(StackCubeCached cubeCachedAbove)
         {
             JointDrive jointYDrive = cubeCachedAbove.Joint.yDrive;
             JointDrive initialPositionSpring = jointYDrive;
 
+            if (jointYDrive.positionSpring == _playerConfig.CubeReconnectSpring)
+                yield break;
+            
             jointYDrive.positionSpring = _playerConfig.CubeReconnectSpring;
             jointYDrive.positionDamper = _playerConfig.CubeReconnectDamper;
             jointYDrive.maximumForce = _playerConfig.CubeReconnectMaximumForce;
-
-            cubeCachedAbove.Joint.yDrive = jointYDrive;
             
-            cubeCachedAbove.CubeRB.OnCollisionEnterAsObservable()
-                .Where(other => other.gameObject.CompareTag(Tags.Player))
-                .Subscribe(_ => cubeCachedAbove.Joint.yDrive = initialPositionSpring);
-        }
+            cubeCachedAbove.Joint.yDrive = jointYDrive;
 
+            yield return new WaitForSeconds(_playerConfig.CubeReconnectSpringBackToNormalCooldown);
+
+            jointYDrive.positionSpring = initialPositionSpring.positionSpring;
+            jointYDrive.positionDamper = initialPositionSpring.positionDamper;
+            jointYDrive.maximumForce = initialPositionSpring.maximumForce;
+            
+            cubeCachedAbove.Joint.yDrive = initialPositionSpring;
+            
+            Debug.Log(cubeCachedAbove.Joint.yDrive.positionSpring);
+        }
     }
 }

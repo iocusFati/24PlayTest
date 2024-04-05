@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using Utils;
 
 namespace Gameplay.Level
@@ -8,18 +7,22 @@ namespace Gameplay.Level
     {
         [SerializeField] private Transform _end;
 
+        private UniqueId _uniqueId;
+        
         private string _id;
+
         public string Id
         {
             get
             {
                 if (_id is null or "")
                 {
-                    UniqueId uniqueId = GetComponent<UniqueId>();
+                    if (_uniqueId is null)
+                    {
+                        _uniqueId = GetComponent<UniqueId>();
+                    }
 
-                    Id = uniqueId.Id;
-
-                    return _id;
+                    Id = _uniqueId.Id;
                 }
 
                 return _id;
@@ -29,5 +32,12 @@ namespace Gameplay.Level
         }
 
         public Vector3 End => _end.position;
+
+        private void Awake()
+        {
+            _uniqueId = GetComponent<UniqueId>();
+            
+            Id = _uniqueId.Id;
+        }
     }
 }

@@ -12,9 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ccdbe6d339e4a218b93c7f181f2eaad, type: 3}
   m_Name: PlayerConfig
   m_EditorClassIdentifier: 
-  _sideSpeed: 5
-  _speed: 1000
+  _sideSpeed: 17.5
+  _speed: 500
+  _gravityModifier: 0.05
   _rightEdgeX: 2.025
   _leftEdgeX: -2.025
+  _simpleCubeAutoreleaseTime: 4
   _cubeHeightOffset: 0.1
   _raiseBy: 0.9
+  _cubeReconnectSpring: 50
+  _cubeReconnectDamper: 2
+  _cubeReconnectMaximumForce: 70
+  _cubeReconnectSpringBackToNormalCooldown: 1

@@ -22,6 +22,7 @@ namespace Infrastructure
         private void Awake()
         {
             _gameStateMachine.RegisterState(_statesFactory.Create<LoadLevelState>());
+            _gameStateMachine.RegisterState(_statesFactory.Create<ReloadLevelState>());
             _gameStateMachine.RegisterState(_statesFactory.Create<GameLoopState>());
             _gameStateMachine.RegisterState(_statesFactory.Create<GameLostState>());
             _gameStateMachine.RegisterState(_statesFactory.Create<LoadProgressState>());

@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using Base.UI.Factory;
 using Gameplay.Level;
 using Infrastructure.AssetProviderService;
 using Infrastructure.Services.Input;
@@ -15,6 +16,8 @@ namespace Infrastructure
 {
     public class BootstrapInstaller : MonoInstaller, ICoroutineRunner
     {
+        [SerializeField] private Updater _updater;
+
         public override void InstallBindings()
         {
             BindStaticData();
@@ -30,8 +33,18 @@ namespace Infrastructure
             BindInputService();
 
             BindFactories();
+
+            BindUpdater();
         }
-        
+
+        private void BindUpdater()
+        {
+            Container
+                .Bind<IUpdater>()
+                .FromInstance(_updater)
+                .AsSingle();
+        }
+
         private void BindInputService() =>
             Container
                 .Bind<IInputService>()
@@ -94,12 +107,21 @@ namespace Infrastructure
         private void BindFactories()
         {
             BindPlayerFactory();
+            BindUIFactory();
 
             void BindPlayerFactory()
             {
                 Container
                     .Bind<IPlayerFactory>()
                     .To<PlayerFactory>()
+                    .AsSingle();
+            }
+            
+            void BindUIFactory()
+            {
+                Container
+                    .Bind<IUIFactory>()
+                    .To<UIFactory>()
                     .AsSingle();
             }
         }

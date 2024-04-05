@@ -1,11 +1,10 @@
 ﻿using Infrastructure.Services.Input;
 using Infrastructure.StaticData.PlayerData;
-using UniRx;
 using UnityEngine;
 
 namespace Infrastructure.States
 {
-    public class PlayerMovement
+    public class PlayerMovement : IUpdatable, IFixedUpdatable
     {
         private readonly IInputService _inputService;
         private readonly Transform _playerTransform;
@@ -13,87 +12,115 @@ namespace Infrastructure.States
         
         private Direction _blockDirection;
         
-        private Rigidbody _baseCubeRB;
+        private readonly Rigidbody _baseCubeRB;
 
-        private readonly CompositeDisposable _sideMoveDisposer;
-        private readonly CompositeDisposable _forwardMoveDisposer;
+        private readonly IUpdater _updater;
+        
+        private bool _isMoving = true;
 
         public PlayerMovement(IInputService inputService, PlayerConfig playerConfig, Transform playerTransform,
-            Rigidbody baseCubeRB)
+            Rigidbody baseCubeRB, IUpdater updater)
         {
             _inputService = inputService;
             _playerTransform = playerTransform;
             _playerConfig = playerConfig;
             _baseCubeRB = baseCubeRB;
-            
-            _sideMoveDisposer = new CompositeDisposable();
-            _forwardMoveDisposer = new CompositeDisposable();
+            _updater = updater;
         }
 
         public void StartMoving()
         {
-            Observable.EveryUpdate()
-                .Subscribe(_ => MoveSide())
-                .AddTo(_sideMoveDisposer);
+            if (_isMoving)
+            {
+                _updater.AddFixedUpdatable(this);
+            }
+            
+            _isMoving = true;
 
-            Observable.EveryFixedUpdate()
-                .Subscribe(_ => MoveForward())
-                .AddTo(_forwardMoveDisposer);
+            // _updater.AddUpdatable(this);
         }
+
+        public void Update()
+        {
+            if (!_isMoving)
+                return;
+
+            // MoveSide(out TODO);
+        }
+
+        public void FixedUpdate()
+        {
+            if (!_isMoving)
+                return;
+            
+            MoveForward();
+        }
+
+        public void StopMoving() => 
+            _isMoving = false;
 
         private void MoveForward()
         {
-            Vector3 velocity = _baseCubeRB.transform.forward * _playerConfig.Speed * Time.fixedDeltaTime;
-            velocity += Physics.gravity;
-            
+            Vector3 velocity = _baseCubeRB.velocity;
+            velocity.z = _playerConfig.Speed * Time.fixedDeltaTime;
+
+            MoveSide(ref velocity);
+            velocity += Physics.gravity * _playerConfig.GravityModifier;
+
             _baseCubeRB.velocity = velocity;
         }
 
-        private void MoveSide()
+        private void MoveSide(ref Vector3 currentVelocity)
         {
             float movement = _inputService.GetMovement();
-            Vector3 playerPos = _playerTransform.position;
             
-            Vector3 hypotheticalDisplacement = 
-                playerPos + new Vector3(movement * _playerConfig.SideSpeed * Time.deltaTime, 0, 0);
+            currentVelocity.x = movement * _playerConfig.SideSpeed * Time.fixedDeltaTime;
             
-            switch (_blockDirection)
-            {
-                case Direction.None:
-                    if (hypotheticalDisplacement.x > _playerConfig.RightEdgeX)
-                    {
-                        _playerTransform.position += new Vector3(_playerConfig.RightEdgeX - playerPos.x, 0, 0);
-                        _blockDirection = Direction.Right;
-                        
-                        return;
-                    }
+            // _baseCubeRB.velocity = currentVelocity;
 
-                    if (hypotheticalDisplacement.x < _playerConfig.LeftEdgeX)
-                    {
-                        _playerTransform.position += new Vector3(_playerConfig.LeftEdgeX - playerPos.x, 0, 0);
-                        _blockDirection = Direction.Left;
-                        
-                        return;
-                    }
 
-                    break;
-                case Direction.Right:
-                    if (movement > 0)
-                        hypotheticalDisplacement = new Vector3(_playerConfig.RightEdgeX, hypotheticalDisplacement.y, hypotheticalDisplacement.z);
-                    else if (movement < 0)
-                        _blockDirection = Direction.None;
-                    
-                    break;
-                case Direction.Left:
-                    if (movement < 0)
-                        hypotheticalDisplacement = new Vector3(_playerConfig.LeftEdgeX, hypotheticalDisplacement.y, hypotheticalDisplacement.z);
-                    else if (movement > 0)
-                        _blockDirection = Direction.None;
-                    
-                    break;
-            }
-            
-            _playerTransform.position = hypotheticalDisplacement;
+            // Vector3 playerPos = _playerTransform.position;
+            //
+            // Vector3 hypotheticalDisplacement = 
+            //     playerPos + new Vector3(movement * _playerConfig.SideSpeed * Time.deltaTime, 0, 0);
+            //
+            // switch (_blockDirection)
+            // {
+            //     case Direction.None:
+            //         if (hypotheticalDisplacement.x > _playerConfig.RightEdgeX)
+            //         {
+            //             _playerTransform.position += new Vector3(_playerConfig.RightEdgeX - playerPos.x, 0, 0);
+            //             _blockDirection = Direction.Right;
+            //             
+            //             return;
+            //         }
+            //
+            //         if (hypotheticalDisplacement.x < _playerConfig.LeftEdgeX)
+            //         {
+            //             _playerTransform.position += new Vector3(_playerConfig.LeftEdgeX - playerPos.x, 0, 0);
+            //             _blockDirection = Direction.Left;
+            //             
+            //             return;
+            //         }
+            //
+            //         break;
+            //     case Direction.Right:
+            //         if (movement > 0)
+            //             hypotheticalDisplacement = new Vector3(_playerConfig.RightEdgeX, hypotheticalDisplacement.y, hypotheticalDisplacement.z);
+            //         else if (movement < 0)
+            //             _blockDirection = Direction.None;
+            //         
+            //         break;
+            //     case Direction.Left:
+            //         if (movement < 0)
+            //             hypotheticalDisplacement = new Vector3(_playerConfig.LeftEdgeX, hypotheticalDisplacement.y, hypotheticalDisplacement.z);
+            //         else if (movement > 0)
+            //             _blockDirection = Direction.None;
+            //         
+            //         break;
+            // }
+            //
+            // _playerTransform.position = hypotheticalDisplacement;
 
         }
     }

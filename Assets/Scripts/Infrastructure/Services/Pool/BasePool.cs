@@ -48,7 +48,6 @@ namespace Infrastructure.Services.Pool
             foreach (var poolable in _activePoolables)
             {
                 ReleaseWithoutRemove(poolable);
-                Debug.Log("Release");
             }            
             _activePoolables.Clear();
         }

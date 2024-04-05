@@ -6,15 +6,17 @@ namespace Infrastructure.StaticData.PlayerData
     [CreateAssetMenu(fileName = "PlayerConfig", menuName = "StaticData/Configs/PlayerConfig")]
     public class PlayerConfig : ScriptableObject
     {
-        [Header("Speed")]
-        [FormerlySerializedAs("_speed")] [SerializeField] private float _sideSpeed;
+        [Header("Physics")] 
+        [SerializeField] private float _sideSpeed;
         [SerializeField] private float _speed;
+        [SerializeField] private float _gravityModifier;
         
         [Header("Edges")]
         [SerializeField] private float _rightEdgeX;
         [SerializeField] private float _leftEdgeX;
         
         [Header("Stacking")]
+        [SerializeField] private double _simpleCubeAutoreleaseTime;
         [SerializeField] private float _cubeHeightOffset = 0.1f;
         [SerializeField] private float _raiseBy = 0.9f;
         
@@ -22,6 +24,7 @@ namespace Infrastructure.StaticData.PlayerData
         [SerializeField] private float _cubeReconnectSpring;
         [SerializeField] private float _cubeReconnectDamper;
         [SerializeField] private float _cubeReconnectMaximumForce;
+        [SerializeField] private float _cubeReconnectSpringBackToNormalCooldown;
 
         public float SideSpeed => _sideSpeed;
 
@@ -40,5 +43,11 @@ namespace Infrastructure.StaticData.PlayerData
         public float CubeReconnectDamper => _cubeReconnectDamper;
 
         public float CubeReconnectMaximumForce => _cubeReconnectMaximumForce;
+
+        public double SimpleCubeAutoreleaseTime => _simpleCubeAutoreleaseTime;
+
+        public float CubeReconnectSpringBackToNormalCooldown => _cubeReconnectSpringBackToNormalCooldown;
+
+        public float GravityModifier => _gravityModifier;
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using Infrastructure.AssetProviderService;
 using UnityEngine;
 using Zenject;
@@ -7,6 +8,8 @@ namespace Infrastructure.States
     public class PlayerFactory : IPlayerFactory
     {
         private readonly IInstantiator _container;
+
+        public event Action<Player> OnPlayerCreated;
 
         public PlayerFactory(IInstantiator container)
         {
@@ -20,6 +23,8 @@ namespace Infrastructure.States
                 new GameObject("Holder").transform);
 
             player.transform.SetParent(null);
+            
+            OnPlayerCreated.Invoke(player);
 
             return player;
         }

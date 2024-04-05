@@ -7,5 +7,6 @@ namespace Infrastructure.Services.Pool
     {
         ChunkPoolsHolder ChunkChunkPools { get; }
         PathPool<Transform> SimpleCubes { get; }
+        PathPool<Transform> PlayerCubes { get; }
     }
 }
