@@ -256,8 +256,6 @@ namespace Infrastructure.States
             await UniTask.Delay(TimeSpan.FromSeconds(_playerConfig.SimpleCubeAutoreleaseTime), DelayType.DeltaTime,
                 PlayerLoopTiming.Update, token);
             
-            Debug.Log("Release");
-            
             _simpleCubesPool.Release(simpleCube);
         }
 
@@ -300,8 +298,6 @@ namespace Infrastructure.States
             jointYDrive.maximumForce = initialPositionSpring.maximumForce;
             
             cubeCachedAbove.Joint.yDrive = initialPositionSpring;
-            
-            Debug.Log(cubeCachedAbove.Joint.yDrive.positionSpring);
         }
     }
 }

@@ -7,5 +7,8 @@
 
         protected override bool CanStartMoving() => 
             UnityEngine.Input.GetMouseButtonDown(0);
+
+        protected override bool StoppedMoving() => 
+            UnityEngine.Input.GetMouseButtonUp(0);
     }
 }

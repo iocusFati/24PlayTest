@@ -11,6 +11,13 @@ namespace Infrastructure.Services.Input
 
         public float GetMovement()
         {
+            if (StoppedMoving())
+            {
+                _lastDisplacement = 0;
+                Debug.Log("Stopped");
+                return 0;
+            }
+
             if (CanStartMoving())
             {
                 _mousePosition1 = UnityEngine.Input.mousePosition;
@@ -23,6 +30,10 @@ namespace Infrastructure.Services.Input
 
                 if (currentDisplacement != 0)
                 {
+                    if (_lastDisplacement == 0)
+                    {
+                        Debug.Log("Last");
+                    }
                     float result = currentDisplacement - _lastDisplacement;
                     _lastDisplacement = currentDisplacement;
 
@@ -32,10 +43,13 @@ namespace Infrastructure.Services.Input
                 _lastDisplacement = 0;
             }
 
+
             return 0;
         }
 
+
         protected abstract bool IsMoving();
         protected abstract bool CanStartMoving();
+        protected abstract bool StoppedMoving();
     }
 }

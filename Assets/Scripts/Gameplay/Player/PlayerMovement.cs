@@ -33,11 +33,10 @@ namespace Infrastructure.States
             if (_isMoving)
             {
                 _updater.AddFixedUpdatable(this);
+                _updater.AddUpdatable(this);
             }
             
             _isMoving = true;
-
-            // _updater.AddUpdatable(this);
         }
 
         public void Update()
@@ -45,7 +44,7 @@ namespace Infrastructure.States
             if (!_isMoving)
                 return;
 
-            // MoveSide(out TODO);
+            _inputService.GetMovement();
         }
 
         public void FixedUpdate()
