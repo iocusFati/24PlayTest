@@ -1,7 +1,6 @@
 ﻿using System;
 using Cinemachine;
 using Cysharp.Threading.Tasks;
-using Gameplay.Camera;
 using Gameplay.Level;
 using Infrastructure.Services.Input;
 using Infrastructure.Services.Pool;
@@ -18,7 +17,8 @@ namespace Infrastructure.States
     public class Player : MonoBehaviour
     {
         [SerializeField] private Rigidbody _baseCubeRB;
-        
+        [SerializeField] private Animator _animator;
+
         private IInputService _inputService;
 
         private LevelGenerator _levelGenerator;
@@ -28,6 +28,7 @@ namespace Infrastructure.States
 
         private PlayerMovement _playerMovement;
         private PlayerStack _playerStack;
+        private PlayerAnimator _playerAnimator;
 
         [Inject]
         public void Construct(LevelGenerator levelGenerator, IStaticDataService staticData, IInputService inputService,
@@ -40,6 +41,7 @@ namespace Infrastructure.States
             _gameStateMachine = gameStateMachine;
 
             _playerMovement = new PlayerMovement(inputService, _playerConfig, transform, _baseCubeRB, updater);
+            _playerAnimator = new PlayerAnimator(_animator);
         }
 
         private void Awake()
@@ -48,9 +50,6 @@ namespace Infrastructure.States
             
             SubscribeForBaseCubeEvents();
             
-            // CinemachineCore.Instance.GetActiveBrain(0)
-            //     .ActiveVirtualCamera.VirtualCameraGameObject.GetComponent<CameraMovement>()
-            //     .SetTarget(_baseCubeRB.transform);
             CinemachineCore.Instance.GetActiveBrain(0)
                 .ActiveVirtualCamera.Follow = _baseCubeRB.transform;
         }
@@ -60,6 +59,7 @@ namespace Infrastructure.States
         {
             other.gameObject.SetActive(false);
             _playerStack.AddCube();
+            _playerAnimator.Jump();
         }
 
         private void InitializePlayerStack()

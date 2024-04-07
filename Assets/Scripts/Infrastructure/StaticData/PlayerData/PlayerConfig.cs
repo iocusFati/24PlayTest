@@ -20,6 +20,11 @@ namespace Infrastructure.StaticData.PlayerData
         [SerializeField] private float _cubeHeightOffset = 0.1f;
         [SerializeField] private float _raiseBy = 0.9f;
         
+        [Header("Plus one text")]
+        [SerializeField] private Vector3 _plusOneTextOffset;
+        [SerializeField] private float _plusOneTextRaiseBy;
+        [SerializeField] private float _plusOneTextRaiseDuration;
+        
         [Header("Joints")]
         [SerializeField] private float _cubeReconnectSpring;
         [SerializeField] private float _cubeReconnectDamper;
@@ -49,5 +54,11 @@ namespace Infrastructure.StaticData.PlayerData
         public float CubeReconnectSpringBackToNormalCooldown => _cubeReconnectSpringBackToNormalCooldown;
 
         public float GravityModifier => _gravityModifier;
+
+        public Vector3 PlusOneTextOffset => _plusOneTextOffset;
+
+        public float PlusOneTextRaiseBy => _plusOneTextRaiseBy;
+
+        public float PlusOneTextRaiseDuration => _plusOneTextRaiseDuration;
     }
 }

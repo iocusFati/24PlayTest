@@ -6,10 +6,7 @@ using Cysharp.Threading.Tasks;
 using Infrastructure.Services.Pool;
 using Infrastructure.StaticData.PlayerData;
 using Sirenix.OdinInspector;
-using UniRx;
-using UniRx.Triggers;
 using UnityEngine;
-using Utils;
 
 namespace Infrastructure.States
 {
@@ -19,7 +16,7 @@ namespace Infrastructure.States
         [SerializeField] private Transform _cubeHolder;
 
         [SerializeField] private List<Transform> _stackedCubes;
-        
+
         private Vector3 _stickmanInitialLocalPosition;
         private Vector3 _cubeHolderInitialLocalPosition;
 
@@ -27,6 +24,9 @@ namespace Infrastructure.States
         private PlayerConfig _playerConfig;
         private BasePool<Transform> _simpleCubesPool;
         private BasePool<Transform> _playerCubePool;
+        private InjectPool<PlusOneText> _plusOneTextPool;
+        private ParticlePool _stackParticlesPool;
+        
         private CancellationTokenSource _tokenSource;
 
         public event Action OnLost;
@@ -36,6 +36,8 @@ namespace Infrastructure.States
             _playerConfig = playerConfig;
             _simpleCubesPool = poolService.SimpleCubes;
             _playerCubePool = poolService.PlayerCubes;
+            _stackParticlesPool = poolService.StackParticles;
+            _plusOneTextPool = poolService.PlusOneText;
         }
 
         private void Awake()
@@ -71,6 +73,9 @@ namespace Infrastructure.States
             if (_stackedCubes.Count == 1) 
                 SetStickman(cube);
 
+            _plusOneTextPool.Get().RaiseText(_stickman.position);
+
+            SpawnStackParticle();
             PlaceBaseBlock();
             SetJoints();
 
@@ -106,6 +111,15 @@ namespace Infrastructure.States
                 
                 spawnCube.SetParent(_cubeHolder);
                 return spawnCube;
+            }
+
+            void SpawnStackParticle()
+            {
+                Vector3 cubeBottomLocalPosition = new Vector3(0, -0.5f, 0);
+                Vector3 particleSpawnPosition = _stackedCubes[^1].TransformPoint(cubeBottomLocalPosition);
+                
+                ParticleSystem particle = _stackParticlesPool.Get();
+                particle.transform.position = particleSpawnPosition;
             }
         }
 

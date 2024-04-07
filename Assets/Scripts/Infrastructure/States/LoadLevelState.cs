@@ -1,4 +1,5 @@
 using Gameplay.Level;
+using Infrastructure.Services.Pool;
 using Infrastructure.Services.SaveLoad;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -13,20 +14,23 @@ namespace Infrastructure.States
         private readonly IPlayerFactory _playerFactory;
         private readonly SceneLoader _sceneLoader;
         private readonly LevelGenerator _levelGenerator;
+        private readonly IPoolService _poolService;
 
         private Transform _initialPoint;
 
         public LoadLevelState(IGameStateMachine gameStateMachine,
             ISaveLoadService saveLoadService,
             IPlayerFactory playerFactory,
-            SceneLoader sceneLoader, 
-            LevelGenerator levelGenerator)
+            SceneLoader sceneLoader,
+            LevelGenerator levelGenerator, 
+            IPoolService poolService)
         {
             _gameStateMachine = gameStateMachine;
             _saveLoadService = saveLoadService;
             _playerFactory = playerFactory;
             _sceneLoader = sceneLoader;
             _levelGenerator = levelGenerator;
+            _poolService = poolService;
         }
 
         public void Enter(string sceneName)
@@ -48,6 +52,7 @@ namespace Infrastructure.States
 
         private void OnLoaded()
         {
+            _poolService.SpawnParents();
             _levelGenerator.Initialize();
             
             _initialPoint = GameObject.FindWithTag(Tags.PlayerSpawn).transform;

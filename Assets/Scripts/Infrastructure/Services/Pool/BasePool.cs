@@ -8,6 +8,8 @@ namespace Infrastructure.Services.Pool
     
     public abstract class BasePool<TPoolable> where TPoolable : Component
     {
+        protected Transform _parent;
+        
         private IObjectPool<TPoolable> _blockPool;
 
         private readonly List<TPoolable> _activePoolables = new();
@@ -54,5 +56,10 @@ namespace Infrastructure.Services.Pool
 
         private void ReleaseWithoutRemove(TPoolable poolable) => 
             _blockPool.Release(poolable);
+
+        public void SpawnParent(string name)
+        {
+            _parent = new GameObject(name).transform;
+        }
     }
 }

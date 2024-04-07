@@ -79,6 +79,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _baseCubeRB: {fileID: 5013642324870634128}
+  _animator: {fileID: 5164739209848966065}
 --- !u!114 &7817041327301211584
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -226,6 +227,10 @@ PrefabInstance:
       propertyPath: m_ConnectedAnchor.z
       value: 0.000098060904
       objectReference: {fileID: 0}
+    - target: {fileID: 4279075403791194285, guid: 6b5d591dbb72ac04a80d42bbb710cb7a, type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7526264990527161519, guid: 6b5d591dbb72ac04a80d42bbb710cb7a, type: 3}
       propertyPath: m_ConnectedAnchor.x
       value: 0.000000029802383
@@ -291,5 +296,10 @@ PrefabInstance:
 --- !u!4 &832749218672296684 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8592876449704432112, guid: 6b5d591dbb72ac04a80d42bbb710cb7a, type: 3}
+  m_PrefabInstance: {fileID: 8993269104018297628}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &5164739209848966065 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 4279075403791194285, guid: 6b5d591dbb72ac04a80d42bbb710cb7a, type: 3}
   m_PrefabInstance: {fileID: 8993269104018297628}
   m_PrefabAsset: {fileID: 0}

@@ -1,5 +1,5 @@
-﻿using Infrastructure.AssetProviderService;
-using UnityEngine;
+﻿using UnityEngine;
+using IAssets = Infrastructure.AssetProviderService.IAssets;
 
 namespace Infrastructure.Services.Pool
 {
@@ -16,6 +16,6 @@ namespace Infrastructure.Services.Pool
         }
 
         protected override TPoolable Spawn() => 
-            _assets.Instantiate<TPoolable>(_path);
+            _assets.Instantiate<TPoolable>(_path, _parent);
     }
 }

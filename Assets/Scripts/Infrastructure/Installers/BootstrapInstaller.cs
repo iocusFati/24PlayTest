@@ -11,6 +11,7 @@ using Infrastructure.Services.StaticDataService;
 using Infrastructure.States;
 using UnityEngine;
 using Zenject;
+using IAssets = Infrastructure.AssetProviderService.IAssets;
 
 namespace Infrastructure
 {

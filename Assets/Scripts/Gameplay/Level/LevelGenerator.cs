@@ -19,7 +19,7 @@ namespace Gameplay.Level
 
         public LevelGenerator(IPoolService poolService, IStaticDataService staticData)
         {
-            _chunkChunkPools = poolService.ChunkChunkPools;
+            _chunkChunkPools = poolService.ChunkPools;
             _chunksConfig = staticData.ChunkConfig;
         }
         

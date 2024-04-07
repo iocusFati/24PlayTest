@@ -19,4 +19,6 @@ MonoBehaviour:
   - {fileID: 4359562928757661681, guid: dedacf260c3b70646ad62cf0d86f4758, type: 3}
   - {fileID: 8839728549759788960, guid: cbf3ed518d0f6e247ac43c48f3a49350, type: 3}
   _maxChunksInOneTime: 6
-  _chunksInTheBeginning: 3
+  _chunksInTheBeginning: 4
+  _spawnOffset: {x: 0, y: 40, z: 0}
+  _moveToSpawnPointDuration: 1

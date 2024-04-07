@@ -19,5 +19,13 @@ namespace Gameplay.Level
 
         public BasePool<Chunk> GetPoolById(string id) => 
             _pools[id];
+
+        public void SpawnParents(string name)
+        {
+            foreach (KeyValuePair<string, BasePool<Chunk>> pool in _pools)
+            {
+                pool.Value.SpawnParent(name);
+            }
+        }
     }
 }
