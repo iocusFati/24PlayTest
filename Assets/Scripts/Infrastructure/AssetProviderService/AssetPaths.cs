@@ -3,9 +3,10 @@ namespace Infrastructure.AssetProviderService
     public abstract class AssetPaths
     {
         public const string Player = "Prefabs/Player/Player";
+        public const string Stickman = "Prefabs/Player/Stickman";
+        public const string PlusOneText = "Prefabs/Player/CollectCubeText";
         public const string SimpleCube = "Prefabs/Cubes/SimpleCube";
         public const string PlayerCube = "Prefabs/Cubes/PlayerCube";
-        public const string PlusOneText = "Prefabs/Player/CollectCubeText";
 
         public const string ChunkConfig = "StaticData/Configs/ChunkConfig";
         public const string PlayerConfig = "StaticData/Configs/PlayerConfig";

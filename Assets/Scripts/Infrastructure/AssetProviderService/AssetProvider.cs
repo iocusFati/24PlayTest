@@ -21,7 +21,14 @@ namespace Infrastructure.AssetProviderService
             TCreatable prefab = Load<TCreatable>(path);
             return Object.Instantiate(prefab);
         }
-        
+
+        public TCreatable Instantiate<TCreatable>(string path, Transform parent, Vector3 position,
+            Quaternion rotation) where TCreatable : Object
+        {
+            TCreatable prefab = Load<TCreatable>(path);
+            return Object.Instantiate(prefab, position, rotation, parent);
+        }
+
         private TCreatable Load<TCreatable>(string path) where TCreatable : Object => 
             Resources.Load<TCreatable>(path);
     }

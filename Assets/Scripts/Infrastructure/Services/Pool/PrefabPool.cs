@@ -13,6 +13,6 @@ namespace Infrastructure.Services.Pool
         }
 
         protected override TPoolable Spawn() => 
-            Object.Instantiate(_prefab);
+            Object.Instantiate(_prefab, _parent);
     }
 }

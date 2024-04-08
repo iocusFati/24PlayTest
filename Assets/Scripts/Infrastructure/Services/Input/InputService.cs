@@ -48,8 +48,8 @@ namespace Infrastructure.Services.Input
         }
 
 
+        public abstract bool CanStartMoving();
         protected abstract bool IsMoving();
-        protected abstract bool CanStartMoving();
         protected abstract bool StoppedMoving();
     }
 }

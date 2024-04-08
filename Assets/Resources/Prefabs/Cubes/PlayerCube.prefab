@@ -130,8 +130,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.95, y: 0.95, z: 0.95}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 0.95, y: 0.80091584, z: 0.95}
+  m_Center: {x: 0, y: -0.074542105, z: 0}
 --- !u!54 &7546646169979133631
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -160,7 +160,7 @@ ConfigurableJoint:
   m_Anchor: {x: 0, y: 0.5, z: 0}
   m_Axis: {x: 1, y: 0, z: 0}
   m_AutoConfigureConnectedAnchor: 0
-  m_ConnectedAnchor: {x: 0, y: 1.6, z: 0}
+  m_ConnectedAnchor: {x: 0, y: 1.55, z: 0}
   serializedVersion: 2
   m_SecondaryAxis: {x: 0, y: 1, z: 0}
   m_XMotion: 0
@@ -207,8 +207,8 @@ ConfigurableJoint:
     maximumForce: 3.4028233e+38
   m_YDrive:
     serializedVersion: 3
-    positionSpring: 1000
-    positionDamper: 20
+    positionSpring: 500
+    positionDamper: 10
     maximumForce: 3.4028233e+38
   m_ZDrive:
     serializedVersion: 3
@@ -242,8 +242,8 @@ ConfigurableJoint:
   m_BreakTorque: Infinity
   m_EnableCollision: 1
   m_EnablePreprocessing: 1
-  m_MassScale: 1
-  m_ConnectedMassScale: 1
+  m_MassScale: 3
+  m_ConnectedMassScale: 4
 --- !u!114 &1450213791222674455
 MonoBehaviour:
   m_ObjectHideFlags: 0

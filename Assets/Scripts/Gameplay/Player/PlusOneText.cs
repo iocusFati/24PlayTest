@@ -1,6 +1,4 @@
-﻿using System;
-using DG.Tweening;
-using Infrastructure.Services.Pool;
+﻿using DG.Tweening;
 using Infrastructure.Services.StaticDataService;
 using Infrastructure.StaticData.PlayerData;
 using UnityEngine;

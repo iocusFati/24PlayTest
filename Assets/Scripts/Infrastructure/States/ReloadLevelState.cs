@@ -49,6 +49,8 @@ namespace Infrastructure.States
             _levelGenerator.GenerateFirstChunks();
             
             _player.BaseCubeToInitialPosition();
+            _player.SpawnStickman();
+            _player.PauseTrail();
 
             await _screenFader.UnfadeAsync();
             

@@ -55,8 +55,11 @@ namespace Infrastructure.States
             MoveForward();
         }
 
-        public void StopMoving() => 
+        public void StopMoving()
+        {
+            _baseCubeRB.velocity = Vector3.zero + Physics.gravity * _playerConfig.GravityModifier;
             _isMoving = false;
+        }
 
         private void MoveForward()
         {
@@ -65,6 +68,8 @@ namespace Infrastructure.States
 
             MoveSide(ref velocity);
             velocity += Physics.gravity * _playerConfig.GravityModifier;
+            
+            Debug.Log(velocity);
 
             _baseCubeRB.velocity = velocity;
         }

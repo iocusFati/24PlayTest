@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using Utils;
 
 namespace Infrastructure.States
 {

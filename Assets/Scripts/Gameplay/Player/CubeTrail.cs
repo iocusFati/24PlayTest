@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Infrastructure.States
 {
@@ -46,6 +45,11 @@ namespace Infrastructure.States
         {
             Vector3 targetPosition = _target.position;
             transform.position = new Vector3(targetPosition.x, transform.position.y, targetPosition.z);
+        }
+
+        public void EnableEmitting(bool emitting)
+        {
+            _trail.emitting = emitting;
         }
     }
 }

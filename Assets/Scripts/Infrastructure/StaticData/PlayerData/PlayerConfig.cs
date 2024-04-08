@@ -10,6 +10,7 @@ namespace Infrastructure.StaticData.PlayerData
         [SerializeField] private float _sideSpeed;
         [SerializeField] private float _speed;
         [SerializeField] private float _gravityModifier;
+        [SerializeField] private float _pushStickmanForce;
         
         [Header("Edges")]
         [SerializeField] private float _rightEdgeX;
@@ -60,5 +61,7 @@ namespace Infrastructure.StaticData.PlayerData
         public float PlusOneTextRaiseBy => _plusOneTextRaiseBy;
 
         public float PlusOneTextRaiseDuration => _plusOneTextRaiseDuration;
+
+        public float PushStickmanForce => _pushStickmanForce;
     }
 }
