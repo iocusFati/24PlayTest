@@ -3,7 +3,7 @@ using Zenject;
 
 namespace Infrastructure.Services.Pool
 {
-    public class InjectPool<TPoolable> : BasePool<TPoolable> where TPoolable : Component
+    public class InjectPool<TPoolable> : BasePool<TPoolable> where TPoolable : MonoBehaviour
     {
         private readonly string _path;
         private readonly IInstantiator _instantiator;

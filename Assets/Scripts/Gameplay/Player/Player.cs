@@ -44,7 +44,7 @@ namespace Infrastructure.States
         [Inject]
         public void Construct(LevelGenerator levelGenerator, IStaticDataService staticData, IInputService inputService,
             IPoolService poolService, IGameStateMachine gameStateMachine, IUpdater updater,
-            ICoroutineRunner coroutineRunner, IAssets assets)
+            ICoroutineRunner coroutineRunner, IAssets assets, CinemachineImpulseInvoker cinemachineImpulseInvoker)
         {
             _levelGenerator = levelGenerator;
             _playerConfig = staticData.PlayerConfig;
@@ -54,10 +54,11 @@ namespace Infrastructure.States
             _assets = assets;
             
             CubeCacher cubeCacher = new CubeCacher();
-            _playerMovement = new PlayerMovement(inputService, _playerConfig, transform, _baseCubeRB, updater);
+            _playerMovement = new PlayerMovement(inputService, _playerConfig, _baseCubeRB, updater);
             _playerAnimator = new PlayerAnimator();
             _playerStack = new PlayerStack(_poolService, this, _playerConfig, _cubesHolder, cubeCacher);
-            _playerCollisions = new PlayerCollisions(_poolService, this, coroutineRunner, _playerConfig, _cubesHolder, cubeCacher);
+            _playerCollisions = new PlayerCollisions(_poolService, this, coroutineRunner, cinemachineImpulseInvoker,
+                _playerConfig, _cubesHolder, cubeCacher);
 
             _playerCollisions.OnLost += Lose;
         }
@@ -98,7 +99,7 @@ namespace Infrastructure.States
 
         public void Initialize()
         {
-            StartMovementOnGetMovement().Forget();
+            StartMovingOnGetInputAsync().Forget();
             _cubeTrail.EnableEmitting(true);
         }
 
@@ -113,6 +114,8 @@ namespace Infrastructure.States
         {
             _playerMovement.StopMoving();
             _playerCollisions.FinishGame();
+
+            _baseCubeRB.isKinematic = true;
             
             _gameStateMachine.Enter<GameLostState>();
         }
@@ -120,14 +123,12 @@ namespace Infrastructure.States
 
         private void SubscribeForBaseCubeEvents()
         {
-            TimeSpan spawnNextChunkTimeSpan = TimeSpan.FromSeconds(1);
+            TimeSpan spawnNextChunkTimeSpan = TimeSpan.FromSeconds(0.3f);
 
-            _baseCubeRB.OnTriggerEnterAsObservable()
-                .Where(other => other.CompareTag(Tags.Pickup))
-                .Subscribe(PickUp);
-
+            SubscribeForPickup();
             SubscribeForNewChunk();
 
+            
             void SubscribeForNewChunk()
             {
                 IObservable<Collider> observable = _baseCubeRB.OnTriggerExitAsObservable()
@@ -142,17 +143,26 @@ namespace Infrastructure.States
                         SubscribeForNewChunk();
                     });
             }
+
+            void SubscribeForPickup()
+            {
+                _baseCubeRB.OnTriggerEnterAsObservable()
+                    .Where(other => other.CompareTag(Tags.Pickup))
+                    .Subscribe(PickUp);
+            }
         }
 
-        public void BaseCubeToInitialPosition()
+        public void BaseCubeToInitialState()
         {
             _playerStack.Initialize();
 
             _playerStack.HolderToInitialPosition();
+            
             _baseCubeRB.transform.localPosition = Vector3.zero;
+            _baseCubeRB.isKinematic = false;
         }
 
-        private async UniTaskVoid StartMovementOnGetMovement()
+        private async UniTaskVoid StartMovingOnGetInputAsync()
         {
             await UniTask.WaitUntil(() => _inputService.CanStartMoving());
             

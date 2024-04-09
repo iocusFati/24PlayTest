@@ -59,6 +59,6 @@ namespace Infrastructure.Services.Pool
             PlayerCubes = new PathPool<Transform>(AssetPaths.PlayerCube, _assets);
 
         private void InitializeChunksPool() => 
-            ChunkPools = new ChunkPoolsHolder(_chunkConfig.ChunkPrefabs);
+            ChunkPools = new ChunkPoolsHolder(_chunkConfig.ChunkPrefabs, _instantiator);
     }
 }

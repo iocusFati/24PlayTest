@@ -24,7 +24,7 @@ MonoBehaviour:
   _plusOneTextOffset: {x: 0, y: 1.6, z: 0}
   _plusOneTextRaiseBy: 1.6
   _plusOneTextRaiseDuration: 1.3
-  _cubeReconnectSpring: 500
-  _cubeReconnectDamper: 5
-  _cubeReconnectMaximumForce: 200
+  _cubeReconnectSpring: 50
+  _cubeReconnectDamper: 2
+  _cubeReconnectMaximumForce: 70
   _cubeReconnectSpringBackToNormalCooldown: 1

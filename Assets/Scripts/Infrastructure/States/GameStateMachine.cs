@@ -1,17 +1,13 @@
 using System;
 using System.Collections.Generic;
+using UniRx;
 
 namespace Infrastructure.States
 {
     public class GameStateMachine : IGameStateMachine
     {
-        private readonly Dictionary<Type, IExitState> _states;
-        private IExitState _currentState;
-        
-        public GameStateMachine()
-        {
-            _states = new Dictionary<Type, IExitState>();
-        }
+        private readonly Dictionary<Type, IExitState> _states = new();
+        public ReactiveProperty<IExitState> CurrentState { get; } = new();
 
         public void Enter<TState>() where TState : class, IState
         {
@@ -28,12 +24,15 @@ namespace Infrastructure.States
         public void RegisterState<TState>(TState state) where TState : IExitState =>
             _states.Add(typeof(TState), state);
 
+        public bool CompareCurrentState<TState>() where TState : IExitState => 
+            CurrentState.Value.GetType() == typeof(TState);
+
         private TState ChangeState<TState>() where TState : class, IExitState
         {
-            _currentState?.Exit();
+            CurrentState.Value?.Exit();
 
             TState state = GetState<TState>();
-            _currentState = state;
+            CurrentState.Value = state;
 
             return state;
         }

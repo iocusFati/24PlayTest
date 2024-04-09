@@ -69,8 +69,6 @@ namespace Gameplay.Level
             
             for (int index = startIndex ; index < _spawnedChunks.Count;) 
                 ReleaseChunk(index);
-            
-            Debug.Log("Spawned chunks " + _spawnedChunks.Count);
         }
 
         private void UpdateSpawnedChunks(Chunk chunk)
@@ -84,25 +82,26 @@ namespace Gameplay.Level
         private bool ChunkCountIsOutOfRange() => 
             _spawnedChunks.Count > _chunksConfig.MaxChunksInOneTime;
 
-        private void ReleaseFirstChunk()
-        {
-            if (_spawnedChunks[0] == _firstChunk)
-            {
-                _firstChunk.gameObject.SetActive(false);
-                _spawnedChunks.RemoveAt(0);
-                
-                return;
-            }
-
+        private void ReleaseFirstChunk() => 
             ReleaseChunk(0);
-        }
 
         private void ReleaseChunk(int index)
         {
-            BasePool<Chunk> pool = _chunkChunkPools.GetPoolById(_spawnedChunks[index].Id);
-            pool.Release(_spawnedChunks[index]);
+            if (IsBaseChunkAtIndex())
+            {
+                _firstChunk.gameObject.SetActive(false);
+            }
+            else
+            {
+                BasePool<Chunk> pool = _chunkChunkPools.GetPoolById(_spawnedChunks[index].Id);
+                pool.Release(_spawnedChunks[index]);
+            }
             
             _spawnedChunks.RemoveAt(index);
+
+            
+            bool IsBaseChunkAtIndex() => 
+                _spawnedChunks[index] == _firstChunk;
         }
 
         private Chunk GetChunk()

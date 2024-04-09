@@ -1,6 +1,7 @@
 ﻿using Base.UI.Factory;
 using Cysharp.Threading.Tasks;
 using Gameplay.Level;
+using Infrastructure.Services.Input;
 using Infrastructure.Services.Pool;
 using UnityEngine;
 
@@ -10,17 +11,21 @@ namespace Infrastructure.States
     {
         private readonly IUIFactory _uiFactory;
         private readonly LevelGenerator _levelGenerator;
+        private readonly IGameStateMachine _gameStateMachine;
+        private readonly IInputService _inputService;
         private readonly BasePool<Transform> _simpleCubePool;
-        
+
         private ScreenFader _screenFader;
         private Player _player;
 
         public ReloadLevelState(LevelGenerator levelGenerator, IUIFactory uiFactory, IPlayerFactory playerFactory,
-            IPoolService poolService)
+            IPoolService poolService, IGameStateMachine gameStateMachine, IInputService inputService)
         {
             _levelGenerator = levelGenerator;
             _uiFactory = uiFactory;
             _simpleCubePool = poolService.SimpleCubes;
+            _gameStateMachine = gameStateMachine;
+            _inputService = inputService;
             
             playerFactory.OnPlayerCreated += player => _player = player;
         }
@@ -47,15 +52,24 @@ namespace Infrastructure.States
             _simpleCubePool.ReleaseAll();
             _levelGenerator.HideAllChunks();
             _levelGenerator.GenerateFirstChunks();
-            
-            _player.BaseCubeToInitialPosition();
-            _player.SpawnStickman();
+
             _player.PauseTrail();
+            _player.BaseCubeToInitialState();
+            _player.SpawnStickman();
 
             await _screenFader.UnfadeAsync();
             
             _player.Initialize();
             _screenFader.Hide();
+            
+            EnterGameLoopStateAsync().Forget();
+        }
+        
+        private async UniTaskVoid EnterGameLoopStateAsync()
+        {
+            await UniTask.WaitUntil(() => _inputService.CanStartMoving());
+            
+            _gameStateMachine.Enter<GameLoopState>();
         }
     }
 }

@@ -1,4 +1,6 @@
+using Cysharp.Threading.Tasks;
 using Gameplay.Level;
+using Infrastructure.Services.Input;
 using Infrastructure.Services.Pool;
 using Infrastructure.Services.SaveLoad;
 using UnityEngine;
@@ -15,6 +17,7 @@ namespace Infrastructure.States
         private readonly SceneLoader _sceneLoader;
         private readonly LevelGenerator _levelGenerator;
         private readonly IPoolService _poolService;
+        private IInputService _inputService;
 
         private Transform _initialPoint;
 
@@ -23,7 +26,8 @@ namespace Infrastructure.States
             IPlayerFactory playerFactory,
             SceneLoader sceneLoader,
             LevelGenerator levelGenerator, 
-            IPoolService poolService)
+            IPoolService poolService, 
+            IInputService inputService)
         {
             _gameStateMachine = gameStateMachine;
             _saveLoadService = saveLoadService;
@@ -31,18 +35,13 @@ namespace Infrastructure.States
             _sceneLoader = sceneLoader;
             _levelGenerator = levelGenerator;
             _poolService = poolService;
+            _inputService = inputService;
         }
 
         public void Enter(string sceneName)
         {
-            if (sceneName != SceneManager.GetActiveScene().name)
-            {
+            if (sceneName != SceneManager.GetActiveScene().name) 
                 _sceneLoader.Load(sceneName, OnLoaded);
-            }
-            else
-            {
-                Reload();
-            }
         }
 
         public void Exit()
@@ -52,6 +51,7 @@ namespace Infrastructure.States
 
         private void OnLoaded()
         {
+            Debug.Log("OnLoaded");
             _poolService.SpawnParents();
             _levelGenerator.Initialize();
             
@@ -60,13 +60,14 @@ namespace Infrastructure.States
             Player player = _playerFactory.CreatePlayer(_initialPoint);
             player.Initialize();
             
-            //
-            // _saveLoadService.InformReaders();
-            // _gameStateMachine.Enter<GameLoopState>();
+            EnterGameLoopStateAsync().Forget();
         }
-
-        private void Reload()
+        
+        private async UniTaskVoid EnterGameLoopStateAsync()
         {
+            await UniTask.WaitUntil(() => _inputService.CanStartMoving());
+            
+            _gameStateMachine.Enter<GameLoopState>();
         }
     }
 }

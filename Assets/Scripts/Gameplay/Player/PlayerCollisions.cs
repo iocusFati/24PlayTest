@@ -15,6 +15,7 @@ namespace Infrastructure.States
         private readonly Transform _cubesHolder;
         private readonly CubeCacher _cubeCacher;
         private readonly PlayerConfig _playerConfig;
+        private CinemachineImpulseInvoker _cinemachineImpulseInvoker;
         private readonly IStackedCubes _stackedCubes;
         private readonly ICoroutineRunner _coroutineRunner;
         private readonly BasePool<Transform> _simpleCubesPool;
@@ -28,12 +29,14 @@ namespace Infrastructure.States
         private List<Transform> StackedCubes => _stackedCubes.Cubes;
 
         public PlayerCollisions(IPoolService poolService, IStackedCubes stackedCubes, ICoroutineRunner coroutineRunner,
-            PlayerConfig playerConfig, Transform cubesHolder, CubeCacher cubeCacher)
+            CinemachineImpulseInvoker cinemachineImpulseInvoker, PlayerConfig playerConfig, Transform cubesHolder,
+            CubeCacher cubeCacher)
         {
             _playerConfig = playerConfig;
             _simpleCubesPool = poolService.SimpleCubes;
             _playerCubePool = poolService.PlayerCubes;
             _coroutineRunner = coroutineRunner;
+            _cinemachineImpulseInvoker = cinemachineImpulseInvoker;
             _cubesHolder = cubesHolder;
 
             _stackedCubes = stackedCubes;
@@ -56,7 +59,7 @@ namespace Infrastructure.States
 
         public void FinishGame()
         {
-            _cubeCacher.Get(StackedCubes[0].gameObject).PlayerCube.enabled = false;
+            // _cubeCacher.Get(StackedCubes[0].gameObject).PlayerCube.enabled = false;
 
             _tokenSource.Cancel();
         }
@@ -74,6 +77,9 @@ namespace Infrastructure.States
         private void AllStackedCubesCheckForCollision()
         {
             List<Transform> collidedCubes = GetCollidedCubes();
+
+            if (collidedCubes.Count > 0) 
+                _cinemachineImpulseInvoker.GenerateImpulse();
 
             if (collidedCubes.Count == StackedCubes.Count || collidedCubes.Contains(StackedCubes[^1]))
             {

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Infrastructure.Services.Pool;
+using Zenject;
 
 namespace Gameplay.Level
 {
@@ -7,11 +8,11 @@ namespace Gameplay.Level
     {
         private readonly Dictionary<string, BasePool<Chunk>> _pools = new();
 
-        public ChunkPoolsHolder(List<Chunk> chunks)
+        public ChunkPoolsHolder(List<Chunk> chunks, IInstantiator instantiator)
         {
             foreach (var chunk in chunks)
             {
-                BasePool<Chunk> pool = new PrefabPool<Chunk>(chunk);
+                BasePool<Chunk> pool = new PrefabInjectPool<Chunk>(chunk, instantiator);
                 
                 _pools.Add(chunk.Id, pool);
             }
