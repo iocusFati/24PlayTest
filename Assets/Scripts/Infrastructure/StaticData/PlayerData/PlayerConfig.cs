@@ -20,6 +20,9 @@ namespace Infrastructure.StaticData.PlayerData
         [SerializeField] private double _simpleCubeAutoreleaseTime;
         [SerializeField] private float _cubeHeightOffset = 0.1f;
         [SerializeField] private float _raiseBy = 0.9f;
+        [SerializeField] private float _cubeSpawnOffsetY = 1.4f;
+        [SerializeField] private int _maxCubes = 10;
+
         
         [Header("Plus one text")]
         [SerializeField] private Vector3 _plusOneTextOffset;
@@ -31,6 +34,8 @@ namespace Infrastructure.StaticData.PlayerData
         [SerializeField] private float _cubeReconnectDamper;
         [SerializeField] private float _cubeReconnectMaximumForce;
         [SerializeField] private float _cubeReconnectSpringBackToNormalCooldown;
+        [SerializeField] private float _baseCubeSpring;
+        [SerializeField] private float _additionalSpringPerCube;
 
         public float SideSpeed => _sideSpeed;
 
@@ -63,5 +68,13 @@ namespace Infrastructure.StaticData.PlayerData
         public float PlusOneTextRaiseDuration => _plusOneTextRaiseDuration;
 
         public float PushStickmanForce => _pushStickmanForce;
+
+        public float BaseCubeSpring => _baseCubeSpring;
+
+        public float AdditionalSpringPerCube => _additionalSpringPerCube;
+
+        public float CubeSpawnOffsetY => _cubeSpawnOffsetY;
+
+        public int MaxCubes => _maxCubes;
     }
 }

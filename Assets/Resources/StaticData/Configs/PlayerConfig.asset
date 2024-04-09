@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ccdbe6d339e4a218b93c7f181f2eaad, type: 3}
   m_Name: PlayerConfig
   m_EditorClassIdentifier: 
-  _sideSpeed: 20
-  _speed: 500
+  _sideSpeed: 40
+  _speed: 1200
   _gravityModifier: 0.1
   _pushStickmanForce: 100
   _rightEdgeX: 2.025
@@ -28,3 +28,5 @@ MonoBehaviour:
   _cubeReconnectDamper: 2
   _cubeReconnectMaximumForce: 70
   _cubeReconnectSpringBackToNormalCooldown: 1
+  _baseCubeSpring: 500
+  _additionalSpringPerCube: 1000

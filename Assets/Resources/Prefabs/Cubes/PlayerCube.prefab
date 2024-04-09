@@ -164,7 +164,7 @@ ConfigurableJoint:
   serializedVersion: 2
   m_SecondaryAxis: {x: 0, y: 1, z: 0}
   m_XMotion: 0
-  m_YMotion: 2
+  m_YMotion: 1
   m_ZMotion: 0
   m_AngularXMotion: 0
   m_AngularYMotion: 0
@@ -173,9 +173,9 @@ ConfigurableJoint:
     spring: 0
     damper: 0
   m_LinearLimit:
-    limit: 0.05
+    limit: 0.1
     bounciness: 0.01
-    contactDistance: 0
+    contactDistance: 0.03
   m_AngularXLimitSpring:
     spring: 0
     damper: 0
@@ -207,7 +207,7 @@ ConfigurableJoint:
     maximumForce: 3.4028233e+38
   m_YDrive:
     serializedVersion: 3
-    positionSpring: 500
+    positionSpring: 10000
     positionDamper: 10
     maximumForce: 3.4028233e+38
   m_ZDrive:
@@ -242,8 +242,8 @@ ConfigurableJoint:
   m_BreakTorque: Infinity
   m_EnableCollision: 1
   m_EnablePreprocessing: 1
-  m_MassScale: 3
-  m_ConnectedMassScale: 4
+  m_MassScale: 1
+  m_ConnectedMassScale: 1
 --- !u!114 &1450213791222674455
 MonoBehaviour:
   m_ObjectHideFlags: 0

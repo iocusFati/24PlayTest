@@ -7,6 +7,7 @@ namespace Infrastructure.States
         public Rigidbody CubeRB { get; set; }
         public ConfigurableJoint Joint { get; }
         public PlayerCube PlayerCube { get; }
+        public bool DontAffectJoint { get; set; }
 
         public StackCubeCached(Rigidbody rigidbody, ConfigurableJoint joint, PlayerCube playerCube)
         {

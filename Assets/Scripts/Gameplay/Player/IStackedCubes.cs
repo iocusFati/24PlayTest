@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
+using UniRx;
 using UnityEngine;
 
 namespace Infrastructure.States
 {
     public interface IStackedCubes
     {
-        List<Transform> Cubes { get; }
+        ReactiveCollection<Transform> Cubes { get; }
     }
 }

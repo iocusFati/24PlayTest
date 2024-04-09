@@ -5,6 +5,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using Infrastructure.Services.Pool;
 using Infrastructure.StaticData.PlayerData;
+using UniRx;
 using UnityEngine;
 
 namespace Infrastructure.States
@@ -15,9 +16,10 @@ namespace Infrastructure.States
         private readonly Transform _cubesHolder;
         private readonly CubeCacher _cubeCacher;
         private readonly PlayerConfig _playerConfig;
-        private CinemachineImpulseInvoker _cinemachineImpulseInvoker;
+        private readonly CinemachineImpulseInvoker _cinemachineImpulseInvoker;
         private readonly IStackedCubes _stackedCubes;
         private readonly ICoroutineRunner _coroutineRunner;
+        private readonly PlayerCubesJointHandler _jointHandler;
         private readonly BasePool<Transform> _simpleCubesPool;
         private readonly BasePool<Transform> _playerCubePool;
 
@@ -26,11 +28,11 @@ namespace Infrastructure.States
 
         public event Action OnLost;
 
-        private List<Transform> StackedCubes => _stackedCubes.Cubes;
+        private ReactiveCollection<Transform> StackedCubes => _stackedCubes.Cubes;
 
         public PlayerCollisions(IPoolService poolService, IStackedCubes stackedCubes, ICoroutineRunner coroutineRunner,
             CinemachineImpulseInvoker cinemachineImpulseInvoker, PlayerConfig playerConfig, Transform cubesHolder,
-            CubeCacher cubeCacher)
+            CubeCacher cubeCacher, PlayerCubesJointHandler jointHandler)
         {
             _playerConfig = playerConfig;
             _simpleCubesPool = poolService.SimpleCubes;
@@ -42,7 +44,8 @@ namespace Infrastructure.States
             _stackedCubes = stackedCubes;
 
             _cubeCacher = cubeCacher;
-            
+            _jointHandler = jointHandler;
+
             _tokenSource = new CancellationTokenSource();
 
             PlayerMainCube mainCube = StackedCubes[0].GetComponent<PlayerMainCube>();
@@ -163,12 +166,13 @@ namespace Infrastructure.States
 
             if (StackedCubes.Count - 1 != cubeIndex)
             {
-                StackCubeCached cubeCachedAboveIndex = _cubeCacher.Get(StackedCubes[cubeIndex + 1].gameObject);
-                StackCubeCached cubeCachedBelowIndex = _cubeCacher.Get(StackedCubes[cubeIndex - 1].gameObject);
+                StackCubeCached cubeCachedAbove = _cubeCacher.Get(StackedCubes[cubeIndex + 1].gameObject);
+                StackCubeCached cubeCachedBelow = _cubeCacher.Get(StackedCubes[cubeIndex - 1].gameObject);
 
-                _coroutineRunner.StartCoroutine(SetJointYDrive(cubeCachedAboveIndex));
+                _jointHandler.SimulateGravityFor(cubeIndex + 1);
+                // _coroutineRunner.StartCoroutine(SetJointYDrive(cubeCachedAboveIndex));
 
-                cubeCachedAboveIndex.Joint.connectedBody = cubeCachedBelowIndex.CubeRB;
+                cubeCachedAbove.Joint.connectedBody = cubeCachedBelow.CubeRB;
             }
             
             StackedCubes.RemoveAt(cubeIndex);

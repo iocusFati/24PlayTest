@@ -36,10 +36,11 @@ namespace Infrastructure.States
         private PlayerStack _playerStack;
         private PlayerCollisions _playerCollisions;
         private PlayerAnimator _playerAnimator;
+        private PlayerCubesJointHandler _playerJoints;
 
         private Stickman _stickman;
 
-        public List<Transform> Cubes => _cubes;
+        public ReactiveCollection<Transform> Cubes { get; set; }
 
         [Inject]
         public void Construct(LevelGenerator levelGenerator, IStaticDataService staticData, IInputService inputService,
@@ -52,20 +53,25 @@ namespace Infrastructure.States
             _poolService = poolService;
             _gameStateMachine = gameStateMachine;
             _assets = assets;
-            
+
             CubeCacher cubeCacher = new CubeCacher();
+            Cubes = _cubes.ToReactiveCollection();
             _playerMovement = new PlayerMovement(inputService, _playerConfig, _baseCubeRB, updater);
             _playerAnimator = new PlayerAnimator();
+            _playerJoints = new PlayerCubesJointHandler(this, cubeCacher, _playerConfig, coroutineRunner);
             _playerStack = new PlayerStack(_poolService, this, _playerConfig, _cubesHolder, cubeCacher);
             _playerCollisions = new PlayerCollisions(_poolService, this, coroutineRunner, cinemachineImpulseInvoker,
-                _playerConfig, _cubesHolder, cubeCacher);
+                _playerConfig, _cubesHolder, cubeCacher, _playerJoints);
 
             _playerCollisions.OnLost += Lose;
         }
 
         private void Awake()
         {
+            
             SubscribeForBaseCubeEvents();
+            
+            _playerJoints.Initialize();
             
             CinemachineCore.Instance.GetActiveBrain(0)
                 .ActiveVirtualCamera.Follow = _baseCubeRB.transform;

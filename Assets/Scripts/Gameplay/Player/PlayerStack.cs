@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using Infrastructure.Services.Pool;
+﻿using Infrastructure.Services.Pool;
 using Infrastructure.StaticData.PlayerData;
 using Sirenix.OdinInspector;
+using UniRx;
 using UnityEngine;
 
 namespace Infrastructure.States
@@ -22,7 +22,7 @@ namespace Infrastructure.States
 
         private readonly IStackedCubes _stackedCubes;
         
-        private List<Transform> StackedCubes => _stackedCubes.Cubes;
+        private ReactiveCollection<Transform> StackedCubes => _stackedCubes.Cubes;
 
         public PlayerStack(IPoolService poolService, IStackedCubes stackedCubes, PlayerConfig playerConfig,
             Transform cubeHolder, CubeCacher cubeCacher)
@@ -59,60 +59,19 @@ namespace Infrastructure.States
         [Button]
         public void AddCube()
         {
-            _cubeHolder.position += new Vector3(0, _playerConfig.RaiseBy, 0);
+            StackCubeCached mainCubeCached = _cubeCacher.Get(StackedCubes[0].gameObject);
+
+            if (_playerConfig.MaxCubes > StackedCubes.Count) 
+                StackCube();
             
-            Transform cube = SpawnCube();
-
-            PlayerCube playerCube = cube.GetComponent<PlayerCube>();
-            playerCube.Construct(this);
-
-            Transform cubeTransform = cube.transform;
-            Transform firstCube = StackedCubes[0];
-            Vector3 firstCubePosition = firstCube.position;
-
-            if (StackedCubes.Count == 1) 
-                SetStickmanTransform(cube);
+            if (StackedCubes.Count == 2) 
+                SetStickmanTransform(StackedCubes[1]);
 
             _plusOneTextPool.Get().RaiseText(_stickman.position);
 
             SpawnStackParticle();
-            PlaceBaseBlock();
-            SetJoints();
-
-            StackedCubes.Insert(1, cubeTransform);
 
             
-            void PlaceBaseBlock()
-            {
-                float cubeSpawnPosY = firstCubePosition.y - firstCube.lossyScale.y * 0.5f - _playerConfig.CubeHeightOffset;
-
-                firstCube.position = new Vector3(firstCubePosition.x, cubeSpawnPosY, firstCubePosition.z);
-                cubeTransform.position = firstCubePosition;
-            }
-
-            void SetJoints()
-            {
-                Rigidbody spawnedRB = _cubeCacher.Get(cube.gameObject).CubeRB;
-                Rigidbody firstRB = _cubeCacher.Get(StackedCubes[0].gameObject).CubeRB;
-                ConfigurableJoint spawnedCubeJoint = _cubeCacher.Get(cube.gameObject).Joint;
-
-                if (StackedCubes.Count > 1)
-                {
-                    ConfigurableJoint secondCubeJoint = StackedCubes[1].GetComponent<ConfigurableJoint>();
-                    secondCubeJoint.connectedBody = spawnedRB;
-                }
-                
-                spawnedCubeJoint.connectedBody = firstRB;
-            }
-
-            Transform SpawnCube()
-            {
-                Transform spawnCube = _playerCubePool.Get();
-                
-                spawnCube.SetParent(_cubeHolder);
-                return spawnCube;
-            }
-
             void SpawnStackParticle()
             {
                 Vector3 cubeBottomLocalPosition = new Vector3(0, -0.5f, 0);
@@ -120,6 +79,64 @@ namespace Infrastructure.States
                 
                 ParticleSystem particle = _stackParticlesPool.Get();
                 particle.transform.position = particleSpawnPosition;
+            }
+
+            Transform PrepareForSpawn(out StackCubeCached secondCubeCached)
+            {
+                Transform secondCube = StackedCubes[1];
+                secondCubeCached = _cubeCacher.Get(secondCube.gameObject);
+                secondCubeCached.Joint.connectedBody = null;
+                return secondCube;
+            }
+
+            Vector3 RaiseSecondCube(Transform secondCube)
+            {
+                Vector3 secondCubePosition = secondCube.position;
+                _cubeHolder.position += new Vector3(0, _playerConfig.RaiseBy, 0);
+                return secondCubePosition;
+            }
+
+            void StackCube()
+            {
+                if (StackedCubes.Count > 1)
+                {
+                    Transform secondCube = PrepareForSpawn(out var secondCubeCached);
+                    Vector3 secondCubePosition = RaiseSecondCube(secondCube);
+                    Transform cube = CreateCube(secondCubePosition);
+
+                    StackCubeCached spawnedCubeCached = _cubeCacher.Get(cube.gameObject);
+                    secondCubeCached.Joint.connectedBody = spawnedCubeCached.CubeRB;
+                    spawnedCubeCached.Joint.connectedBody = mainCubeCached.CubeRB;
+                }
+                else
+                {
+                    Vector3 cubeSpawnPosition = StackedCubes[0].position + new Vector3(0, _playerConfig.CubeSpawnOffsetY, 0);
+                    Transform cube = CreateCube(cubeSpawnPosition);
+                
+                    StackCubeCached spawnedCubeCached = _cubeCacher.Get(cube.gameObject);
+                    spawnedCubeCached.Joint.connectedBody = mainCubeCached.CubeRB;
+                }
+            }
+        }
+
+        private Transform CreateCube(Vector3 spawnPosition)
+        {
+            Transform cube = SpawnCube();
+            
+            PlayerCube playerCube = cube.GetComponent<PlayerCube>();
+            playerCube.Construct(this);
+            
+            StackedCubes.Insert(1, cube);
+            cube.position = spawnPosition;
+            
+            return cube;
+
+            Transform SpawnCube()
+            {
+                Transform spawnCube = _playerCubePool.Get();
+                
+                spawnCube.SetParent(_cubeHolder);
+                return spawnCube;
             }
         }
 
