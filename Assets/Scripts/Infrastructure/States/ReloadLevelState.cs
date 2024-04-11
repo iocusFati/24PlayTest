@@ -3,6 +3,8 @@ using Cysharp.Threading.Tasks;
 using Gameplay.Level;
 using Infrastructure.Services.Input;
 using Infrastructure.Services.Pool;
+using UI.Mediator;
+using UI.Windows;
 using UnityEngine;
 
 namespace Infrastructure.States
@@ -17,16 +19,18 @@ namespace Infrastructure.States
 
         private ScreenFader _screenFader;
         private Player _player;
+        private readonly IUIMediator _uiMediator;
 
         public ReloadLevelState(LevelGenerator levelGenerator, IUIFactory uiFactory, IPlayerFactory playerFactory,
-            IPoolService poolService, IGameStateMachine gameStateMachine, IInputService inputService)
+            IPoolService poolService, IGameStateMachine gameStateMachine, IInputService inputService, IUIMediator uiMediator)
         {
             _levelGenerator = levelGenerator;
             _uiFactory = uiFactory;
             _simpleCubePool = poolService.SimpleCubes;
             _gameStateMachine = gameStateMachine;
             _inputService = inputService;
-            
+            _uiMediator = uiMediator;
+
             playerFactory.OnPlayerCreated += player => _player = player;
         }
 
@@ -49,6 +53,7 @@ namespace Infrastructure.States
             _screenFader.Show();
             await _screenFader.FadeAsync();
 
+            _uiMediator.ShowStartWindow();
             _simpleCubePool.ReleaseAll();
             _levelGenerator.HideAllChunks();
             _levelGenerator.GenerateFirstChunks();
@@ -70,6 +75,7 @@ namespace Infrastructure.States
             await UniTask.WaitUntil(() => _inputService.CanStartMoving());
             
             _gameStateMachine.Enter<GameLoopState>();
+            _uiMediator.HideStartWindow();
         }
     }
 }

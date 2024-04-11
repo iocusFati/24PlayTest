@@ -14,7 +14,6 @@ namespace Infrastructure.Services.Input
             if (StoppedMoving())
             {
                 _lastDisplacement = 0;
-                Debug.Log("Stopped");
                 return 0;
             }
 
@@ -30,10 +29,6 @@ namespace Infrastructure.Services.Input
 
                 if (currentDisplacement != 0)
                 {
-                    if (_lastDisplacement == 0)
-                    {
-                        Debug.Log("Last");
-                    }
                     float result = currentDisplacement - _lastDisplacement;
                     _lastDisplacement = currentDisplacement;
 

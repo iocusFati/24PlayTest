@@ -25,7 +25,6 @@ namespace Infrastructure.States
             
             hitRB.AddForceAtPosition(force, position, ForceMode.Impulse);
             
-            Debug.Log(hitRB);
         }
     }
 }

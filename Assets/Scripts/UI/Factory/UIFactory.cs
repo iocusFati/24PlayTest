@@ -1,5 +1,5 @@
 ﻿using Infrastructure.AssetProviderService;
-using Infrastructure.States;
+using UI.Windows;
 using UnityEngine;
 using Zenject;
 using IAssets = Infrastructure.AssetProviderService.IAssets;
@@ -9,10 +9,7 @@ namespace Base.UI.Factory
     public class UIFactory : IUIFactory
     {
         private readonly IAssets _assets;
-        private UIHolder _uiContainer;
 
-        private const int HudCanvasOrder = 1;
-        
         private Canvas _gameRoot;
 
         [Inject]
@@ -21,39 +18,31 @@ namespace Base.UI.Factory
             _assets = assets;
         }
 
-        public void Initialize(UIHolder uiHolder) => 
-            _uiContainer = uiHolder;
-
         public void CreateGameUIRoot() => 
             _gameRoot = CreateUIRoot("GameRoot");
+        
+        public LostPopUp CreateLostPopUp() => 
+            CreateUIEntity<LostPopUp>(AssetPaths.LostPopUp);
 
-        public HUD CreateHUD()
+        public GameObject CreateStartWindow() => 
+            CreateUIEntity<GameObject>(AssetPaths.StartWindow);
+
+        public GameObject CreateCurtain()
         {
-            Canvas hudCanvas = CreateUIRoot("HUD", HudCanvasOrder);
+            GameObject curtain = _assets.Instantiate<GameObject>(AssetPaths.Curtain);
+            curtain.SetActive(false);
 
-            HUD hud = CreateUIEntity<HUD>(AssetPaths.HUD, hudCanvas);
-
-            return hud;
+            return curtain;
         }
 
-        public LostPopUp CreateLostPopUp()
-        {
-            LostPopUp lostPopUp = CreateUIEntity<LostPopUp>(AssetPaths.LostPopUp);
+        public ScreenFader CreateScreenFader() => 
+            CreateUIEntity<ScreenFader>(AssetPaths.ScreenFader);
 
-            return lostPopUp;
-        }
-
-        public ScreenFader CreateScreenFader()
-        {
-            return CreateUIEntity<ScreenFader>(AssetPaths.ScreenFader);
-        }
-
-        private TEntity CreateUIEntity<TEntity>(string path, Canvas parent = null) where TEntity : Component, IUIEntity
+        private TEntity CreateUIEntity<TEntity>(string path, Canvas parent = null) where TEntity : Object
         {
             SetParentIfNull();
 
             TEntity entity = _assets.Instantiate<TEntity>(path, parent.transform);
-            // _uiContainer.RegisterUIEntity(entity);
 
             return entity;
 

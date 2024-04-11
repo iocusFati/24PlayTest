@@ -39,8 +39,9 @@ namespace Infrastructure.States
         private PlayerCubesJointHandler _playerJoints;
 
         private Stickman _stickman;
+        private Vector3 _baseCubeInitialPosition;
 
-        public ReactiveCollection<Transform> Cubes { get; set; }
+        public ReactiveCollection<Transform> Cubes { get; private set; }
 
         [Inject]
         public void Construct(LevelGenerator levelGenerator, IStaticDataService staticData, IInputService inputService,
@@ -68,7 +69,7 @@ namespace Infrastructure.States
 
         private void Awake()
         {
-            
+            _baseCubeInitialPosition = _baseCubeRB.transform.position;
             SubscribeForBaseCubeEvents();
             
             _playerJoints.Initialize();
@@ -164,7 +165,7 @@ namespace Infrastructure.States
 
             _playerStack.HolderToInitialPosition();
             
-            _baseCubeRB.transform.localPosition = Vector3.zero;
+            _baseCubeRB.transform.position = _baseCubeInitialPosition;
             _baseCubeRB.isKinematic = false;
         }
 

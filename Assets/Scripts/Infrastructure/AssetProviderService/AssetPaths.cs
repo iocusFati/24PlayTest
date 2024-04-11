@@ -14,6 +14,8 @@ namespace Infrastructure.AssetProviderService
         public const string UIRoot = "Prefabs/UI/UIRoot";
         public const string LostPopUp = "Prefabs/UI/LostPopUp";
         public const string ScreenFader = "Prefabs/UI/ScreenFader";
+        public const string StartWindow = "Prefabs/UI/StartWindow";
+        public const string Curtain = "Prefabs/UI/Curtain";
 
         public const string StackParticle = "Prefabs/Particles/CubeStackEffect";
 

@@ -1,14 +1,11 @@
-using System;
-using System.Collections;
 using Base.UI.Factory;
 using Gameplay.Level;
 using Infrastructure.AssetProviderService;
 using Infrastructure.Services.Input;
-using Infrastructure.Services.PersistentProgress;
 using Infrastructure.Services.Pool;
-using Infrastructure.Services.SaveLoad;
 using Infrastructure.Services.StaticDataService;
 using Infrastructure.States;
+using UI.Mediator;
 using UnityEngine;
 using Zenject;
 using IAssets = Infrastructure.AssetProviderService.IAssets;
@@ -26,16 +23,21 @@ namespace Infrastructure
             BindStatesFactory();
             BindCoroutineRunner();
             BindGameStateMachine();
-            BindSaveLoadService();
-            BindPersistentProgress();
             BindAssetsService();
             BindPoolService();
             BindLevelGenerator();
             BindInputService();
-
+            BindUIMediator();
             BindFactories();
-
             BindUpdater();
+        }
+
+        private void BindUIMediator()
+        {
+            Container
+                .Bind<IUIMediator>()
+                .To<UIMediator>()
+                .AsSingle();
         }
 
         private void BindUpdater()
@@ -88,23 +90,7 @@ namespace Infrastructure
                 .To<AssetProvider>()
                 .AsSingle();
         }
-
-        private void BindPersistentProgress()
-        {
-            Container
-                .Bind<IPersistentProgressService>()
-                .To<PersistentProgressService>()
-                .AsSingle();
-        }
-
-        private void BindSaveLoadService()
-        {
-            Container
-                .Bind<ISaveLoadService>()
-                .To<SaveLoadService>()
-                .AsSingle();
-        }
-
+        
         private void BindFactories()
         {
             BindPlayerFactory();
@@ -156,17 +142,6 @@ namespace Infrastructure
                 .To<GameStateMachine>()
                 .FromInstance(new GameStateMachine())
                 .AsSingle();
-        }
-
-        public void DoAfter(Func<bool> condition, Action action) => 
-            StartCoroutine(DoAfterCoroutine(condition, action));
-
-        private IEnumerator DoAfterCoroutine(Func<bool> condition, Action action)
-        {
-            yield return new WaitUntil(condition);
-
-            Debug.Log("Action");
-            action.Invoke();
         }
 
         private IInputService InputService() =>

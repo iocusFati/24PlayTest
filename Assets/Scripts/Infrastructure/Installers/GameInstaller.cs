@@ -11,7 +11,6 @@ namespace Infrastructure
 
         public override void InstallBindings()
         {
-            Debug.Log("Bind");
             BindImpulseInvoker();
         }
 
