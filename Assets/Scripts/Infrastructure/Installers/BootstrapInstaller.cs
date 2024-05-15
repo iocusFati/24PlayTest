@@ -1,12 +1,14 @@
 using Base.UI.Factory;
 using Gameplay.Level;
 using Infrastructure.AssetProviderService;
+using Infrastructure.Services.Analytics;
 using Infrastructure.Services.Input;
 using Infrastructure.Services.Pool;
 using Infrastructure.Services.StaticDataService;
 using Infrastructure.States;
 using UI.Mediator;
 using UnityEngine;
+using UnityEngine.Rendering;
 using Zenject;
 using IAssets = Infrastructure.AssetProviderService.IAssets;
 
@@ -18,6 +20,7 @@ namespace Infrastructure
 
         public override void InstallBindings()
         {
+            BindAnalytics();
             BindStaticData();
             BindSceneLoader();
             BindStatesFactory();
@@ -30,6 +33,14 @@ namespace Infrastructure
             BindUIMediator();
             BindFactories();
             BindUpdater();
+        }
+
+        private void BindAnalytics()
+        {
+            Container
+                .Bind<IAnalyticsService>()
+                .To<AnalyticsService>()
+                .AsSingle();
         }
 
         private void BindUIMediator()
